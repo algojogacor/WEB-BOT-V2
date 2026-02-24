@@ -1,286 +1,560 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AlgojoGacor — Peternakan</title>
-<link rel="stylesheet" href="/css/main.css">
-<link rel="stylesheet" href="/css/dashboard.css">
-<style>
-.animal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
-.animal-card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:16px;transition:border-color .2s}
-.animal-card:hover{border-color:var(--accent-green)}
-.animal-icon{font-size:48px;text-align:center;margin-bottom:8px}
-.tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:2px solid var(--border);padding-bottom:0}
-.tab{padding:10px 20px;cursor:pointer;border-radius:8px 8px 0 0;font-weight:600;font-size:13px;color:var(--text-secondary);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
-.tab.active{color:var(--accent-green);border-bottom-color:var(--accent-green);background:rgba(57,197,87,.08)}
-.qty-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.qty-input{width:70px;text-align:center;padding:6px;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);font-size:14px}
-.hewan-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--hover-bg);border-radius:10px;margin-bottom:10px;border:1px solid var(--border)}
-.timer-ready{color:#ff9f43;font-weight:700;animation:pulse 1s infinite}
-.timer-wait{color:var(--text-secondary);font-size:12px}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
-.profit-badge{font-size:11px;background:rgba(57,197,87,.15);color:var(--accent-green);border-radius:20px;padding:2px 10px;font-weight:700}
-</style>
-</head>
-<body>
-<div class="app-layout">
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo"><span class="logo-icon">⚔️</span><div><div class="logo-text">AlgojoGacor</div><div class="logo-sub">Web Platform</div></div></div>
-  <nav class="sidebar-nav">
-    <div class="nav-section">Utama</div>
-    <a class="nav-item" href="/dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a>
-    <a class="nav-item" href="/pages/profile.html"><span class="nav-icon">👤</span> Profil & Status</a>
-    <a class="nav-item" href="/chat.html"><span class="nav-icon">💬</span> Live Chat</a>
-    <div class="nav-section">Kehidupan & Ekonomi</div>
-    <a class="nav-item" href="/pages/economy.html"><span class="nav-icon">💰</span> Ekonomi & Bank</a>
-    <a class="nav-item" href="/pages/jobs.html"><span class="nav-icon">💼</span> Pekerjaan</a>
-    <a class="nav-item" href="/pages/life.html"><span class="nav-icon">❤️</span> Survival</a>
-    <div class="nav-section">Games</div>
-    <a class="nav-item" href="/pages/games.html"><span class="nav-icon">🎮</span> Casino & Games</a>
-    <a class="nav-item" href="/pages/minigames.html"><span class="nav-icon">🎲</span> Mini Games</a>
-    <div class="nav-section">Bisnis</div>
-    <a class="nav-item" href="/pages/farming.html"><span class="nav-icon">🌾</span> Farming</a>
-    <a class="nav-item active" href="/pages/ternak.html"><span class="nav-icon">🐄</span> Peternakan</a>
-    <a class="nav-item" href="/pages/mining.html"><span class="nav-icon">⛏️</span> Mining</a>
-    <a class="nav-item" href="/pages/property.html"><span class="nav-icon">🏢</span> Properti</a>
-    <div class="nav-section">AI & Tools</div>
-    <a class="nav-item" href="/pages/ai.html"><span class="nav-icon">🤖</span> AI Chat</a>
-    <a class="nav-item" href="/pages/tools.html"><span class="nav-icon">🛠️</span> Tools & Utilitas</a>
-    <a class="nav-item" href="/pages/leaderboard.html"><span class="nav-icon">🏆</span> Leaderboard</a>
-    <div class="nav-section admin-only hidden">Admin</div>
-    <a class="nav-item admin-only hidden" href="/pages/admin.html"><span class="nav-icon">⚙️</span> Panel Admin</a>
-  </nav>
-  <div class="sidebar-footer">
-    <div class="user-info"><div class="user-avatar" id="sidebar-avatar">?</div>
-    <div><div class="user-name" id="sidebar-username">Loading...</div><div class="user-role" id="sidebar-role">—</div></div></div>
-    <button class="btn btn-secondary btn-block btn-sm" onclick="logout()">🚪 Logout</button>
-  </div>
-</aside>
-
-<div class="main-content">
-<header class="topbar">
-  <div style="display:flex;align-items:center;gap:12px">
-    <button class="hamburger" onclick="toggleSidebar()">☰</button>
-    <span class="topbar-title">🐄 Peternakan</span>
-  </div>
-  <div style="font-size:13px;color:var(--text-secondary)">Saldo: <span id="top-balance" style="font-weight:700;color:var(--accent-green)">...</span></div>
-</header>
-
-<main class="content-area">
-  <div class="status-grid" style="margin-bottom:20px">
-    <div class="stat-card"><div class="stat-value" id="stat-total">0</div><div class="stat-label">🐄 Total Hewan</div></div>
-    <div class="stat-card"><div class="stat-value" id="stat-ready">0</div><div class="stat-label">💰 Siap Jual</div></div>
-    <div class="stat-card"><div class="stat-value" id="stat-slots">0/8</div><div class="stat-label">📦 Slot Kandang</div></div>
-    <div class="stat-card"><div class="stat-value" id="stat-balance">...</div><div class="stat-label">💰 Saldo</div></div>
-    <div class="stat-card"><div class="stat-value" id="stat-profit">Rp0</div><div class="stat-label">📈 Est. Profit</div></div>
-  </div>
-
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('kandang')">🐄 Kandang Saya</div>
-    <div class="tab" onclick="switchTab('pasar-hewan')">🏪 Beli Hewan</div>
-    <div class="tab" onclick="switchTab('panduan')">📖 Panduan</div>
-  </div>
-
-  <!-- KANDANG -->
-  <div id="tab-kandang">
-    <div class="card" style="margin-bottom:20px">
-      <div class="card-header">
-        <span class="icon">🐄</span><h3>Kandang</h3>
-        <div style="margin-left:auto;display:flex;gap:8px">
-          <button class="btn btn-secondary btn-sm" onclick="beriPakan()">🍖 Beri Pakan Semua</button>
-          <button class="btn btn-primary btn-sm" onclick="jualSemua()">💰 Jual Siap Jual</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>AlgojoGacor — Peternakan</title>
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <style>
+      .animal-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 16px;
+      }
+      .animal-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        transition: border-color 0.2s;
+      }
+      .animal-card:hover {
+        border-color: var(--accent-green);
+      }
+      .animal-icon {
+        font-size: 48px;
+        text-align: center;
+        margin-bottom: 8px;
+      }
+      .tabs {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid var(--border);
+        padding-bottom: 0;
+      }
+      .tab {
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 8px 8px 0 0;
+        font-weight: 600;
+        font-size: 13px;
+        color: var(--text-secondary);
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+        transition: all 0.2s;
+      }
+      .tab.active {
+        color: var(--accent-green);
+        border-bottom-color: var(--accent-green);
+        background: rgba(57, 197, 87, 0.08);
+      }
+      .qty-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .qty-input {
+        width: 70px;
+        text-align: center;
+        padding: 6px;
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-size: 14px;
+      }
+      .hewan-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: var(--hover-bg);
+        border-radius: 10px;
+        margin-bottom: 10px;
+        border: 1px solid var(--border);
+      }
+      .timer-ready {
+        color: #ff9f43;
+        font-weight: 700;
+        animation: pulse 1s infinite;
+      }
+      .timer-wait {
+        color: var(--text-secondary);
+        font-size: 12px;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.6;
+        }
+      }
+      .profit-badge {
+        font-size: 11px;
+        background: rgba(57, 197, 87, 0.15);
+        color: var(--accent-green);
+        border-radius: 20px;
+        padding: 2px 10px;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <span class="logo-icon">⚔️</span>
+          <div>
+            <div class="logo-text">AlgojoGacor</div>
+            <div class="logo-sub">Web Platform</div>
+          </div>
         </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section">Utama</div>
+          <a class="nav-item" href="/dashboard.html"
+            ><span class="nav-icon">🏠</span> Dashboard</a
+          >
+          <a class="nav-item" href="/pages/profile.html"
+            ><span class="nav-icon">👤</span> Profil & Status</a
+          >
+          <a class="nav-item" href="/chat.html"
+            ><span class="nav-icon">💬</span> Live Chat</a
+          >
+          <div class="nav-section">Kehidupan & Ekonomi</div>
+          <a class="nav-item" href="/pages/economy.html"
+            ><span class="nav-icon">💰</span> Ekonomi & Bank</a
+          >
+          <a class="nav-item" href="/pages/jobs.html"
+            ><span class="nav-icon">💼</span> Pekerjaan</a
+          >
+          <a class="nav-item" href="/pages/life.html"
+            ><span class="nav-icon">❤️</span> Survival</a
+          >
+          <div class="nav-section">Games</div>
+          <a class="nav-item" href="/pages/games.html"
+            ><span class="nav-icon">🎮</span> Casino & Games</a
+          >
+          <a class="nav-item" href="/pages/minigames.html"
+            ><span class="nav-icon">🎲</span> Mini Games</a
+          >
+          <div class="nav-section">Bisnis</div>
+          <a class="nav-item" href="/pages/farming.html"
+            ><span class="nav-icon">🌾</span> Farming</a
+          >
+          <a class="nav-item active" href="/pages/ternak.html"
+            ><span class="nav-icon">🐄</span> Peternakan</a
+          >
+          <a class="nav-item" href="/pages/mining.html"
+            ><span class="nav-icon">⛏️</span> Mining</a
+          >
+          <a class="nav-item" href="/pages/property.html"
+            ><span class="nav-icon">🏢</span> Properti</a
+          >
+          <div class="nav-section">AI & Tools</div>
+          <a class="nav-item" href="/pages/ai.html"
+            ><span class="nav-icon">🤖</span> AI Chat</a
+          >
+          <a class="nav-item" href="/pages/tools.html"
+            ><span class="nav-icon">🛠️</span> Tools & Utilitas</a
+          >
+          <a class="nav-item" href="/pages/leaderboard.html"
+            ><span class="nav-icon">🏆</span> Leaderboard</a
+          >
+          <div class="nav-section admin-only hidden">Admin</div>
+          <a class="nav-item admin-only hidden" href="/pages/admin.html"
+            ><span class="nav-icon">⚙️</span> Panel Admin</a
+          >
+        </nav>
+        <div class="sidebar-footer">
+          <div class="user-info">
+            <div class="user-avatar" id="sidebar-avatar">?</div>
+            <div>
+              <div class="user-name" id="sidebar-username">Loading...</div>
+              <div class="user-role" id="sidebar-role">—</div>
+            </div>
+          </div>
+          <button class="btn btn-secondary btn-block btn-sm" onclick="logout()">
+            🚪 Logout
+          </button>
+        </div>
+      </aside>
+
+      <div class="main-content">
+        <header class="topbar">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <button class="hamburger" onclick="toggleSidebar()">☰</button>
+            <span class="topbar-title">🐄 Peternakan</span>
+          </div>
+          <div style="font-size: 13px; color: var(--text-secondary)">
+            Saldo:
+            <span
+              id="top-balance"
+              style="font-weight: 700; color: var(--accent-green)"
+              >...</span
+            >
+          </div>
+        </header>
+
+        <main class="content-area">
+          <div class="status-grid" style="margin-bottom: 20px">
+            <div class="stat-card">
+              <div class="stat-value" id="stat-total">0</div>
+              <div class="stat-label">🐄 Total Hewan</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-ready">0</div>
+              <div class="stat-label">💰 Siap Jual</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-slots">0/8</div>
+              <div class="stat-label">📦 Slot Kandang</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-balance">...</div>
+              <div class="stat-label">💰 Saldo</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-profit">Rp0</div>
+              <div class="stat-label">📈 Est. Profit</div>
+            </div>
+          </div>
+
+          <div class="tabs">
+            <div class="tab active" onclick="switchTab('kandang')">
+              🐄 Kandang Saya
+            </div>
+            <div class="tab" onclick="switchTab('pasar-hewan')">
+              🏪 Beli Hewan
+            </div>
+            <div class="tab" onclick="switchTab('panduan')">📖 Panduan</div>
+          </div>
+
+          <!-- KANDANG -->
+          <div id="tab-kandang">
+            <div class="card" style="margin-bottom: 20px">
+              <div class="card-header">
+                <span class="icon">🐄</span>
+                <h3>Kandang</h3>
+                <div style="margin-left: auto; display: flex; gap: 8px">
+                  <button
+                    class="btn btn-secondary btn-sm"
+                    onclick="beriPakan()"
+                  >
+                    🍖 Beri Pakan Semua
+                  </button>
+                  <button class="btn btn-primary btn-sm" onclick="jualSemua()">
+                    💰 Jual Siap Jual
+                  </button>
+                </div>
+              </div>
+              <div id="kandang-list">
+                <div class="alert alert-info">
+                  Kandang kosong. Beli hewan dulu!
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PASAR HEWAN -->
+          <div id="tab-pasar-hewan" class="hidden">
+            <div class="card">
+              <div class="card-header">
+                <span class="icon">🏪</span>
+                <h3>Pasar Hewan Ternak</h3>
+              </div>
+              <div class="animal-grid" id="animal-shop-grid"></div>
+            </div>
+          </div>
+
+          <!-- PANDUAN -->
+          <div id="tab-panduan" class="hidden">
+            <div class="card">
+              <div class="card-header">
+                <span class="icon">📖</span>
+                <h3>Cara Main Peternakan</h3>
+              </div>
+              <div style="line-height: 2">
+                <p>
+                  🐄 <b>Beli hewan</b> → hewan masuk kandang dan mulai tumbuh.
+                </p>
+                <p>
+                  🍖 <b>Beri Pakan</b> → mempercepat pertumbuhan hewan (potong 1
+                  jam waktu).
+                </p>
+                <p>
+                  💰 <b>Jual</b> → setelah timer selesai, hewan siap dijual
+                  dengan harga jual.
+                </p>
+                <p>
+                  📈 <b>Profit</b> → harga jual jauh melebihi modal pembelian.
+                </p>
+                <hr style="margin: 16px 0; border-color: var(--border)" />
+                <h4 style="margin-bottom: 12px">📊 Perbandingan Untung-Rugi</h4>
+                <div id="profit-table"></div>
+              </div>
+            </div>
+          </div>
+        </main>
       </div>
-      <div id="kandang-list"><div class="alert alert-info">Kandang kosong. Beli hewan dulu!</div></div>
     </div>
-  </div>
 
-  <!-- PASAR HEWAN -->
-  <div id="tab-pasar-hewan" class="hidden">
-    <div class="card">
-      <div class="card-header"><span class="icon">🏪</span><h3>Pasar Hewan Ternak</h3></div>
-      <div class="animal-grid" id="animal-shop-grid"></div>
-    </div>
-  </div>
+    <div id="toast-container"></div>
+    <script src="/js/api.js"></script>
+    <script>
+      const ANIMALS = {
+        ayam: {
+          icon: "🐔",
+          name: "Ayam Kampung",
+          beli: 50000,
+          jual: 250000,
+          durasi: 2,
+          label: "2 jam",
+        },
+        gurame: {
+          icon: "🐟",
+          name: "Ikan Gurame",
+          beli: 200000,
+          jual: 1000000,
+          durasi: 4,
+          label: "4 jam",
+        },
+        kambing: {
+          icon: "🐐",
+          name: "Kambing Etawa",
+          beli: 3000000,
+          jual: 15000000,
+          durasi: 8,
+          label: "8 jam",
+        },
+        sapi: {
+          icon: "🐄",
+          name: "Sapi Brahma",
+          beli: 15000000,
+          jual: 75000000,
+          durasi: 24,
+          label: "24 jam",
+        },
+        kuda: {
+          icon: "🐎",
+          name: "Kuda Pacu",
+          beli: 40000000,
+          jual: 200000000,
+          durasi: 48,
+          label: "48 jam",
+        },
+        unta: {
+          icon: "🐫",
+          name: "Unta Arab",
+          beli: 80000000,
+          jual: 400000000,
+          durasi: 72,
+          label: "72 jam",
+        },
+      };
 
-  <!-- PANDUAN -->
-  <div id="tab-panduan" class="hidden">
-    <div class="card">
-      <div class="card-header"><span class="icon">📖</span><h3>Cara Main Peternakan</h3></div>
-      <div style="line-height:2">
-        <p>🐄 <b>Beli hewan</b> → hewan masuk kandang dan mulai tumbuh.</p>
-        <p>🍖 <b>Beri Pakan</b> → mempercepat pertumbuhan hewan (potong 1 jam waktu).</p>
-        <p>💰 <b>Jual</b> → setelah timer selesai, hewan siap dijual dengan harga jual.</p>
-        <p>📈 <b>Profit</b> → harga jual jauh melebihi modal pembelian.</p>
-        <hr style="margin:16px 0;border-color:var(--border)">
-        <h4 style="margin-bottom:12px">📊 Perbandingan Untung-Rugi</h4>
-        <div id="profit-table"></div>
-      </div>
-    </div>
-  </div>
-</main>
-</div>
-</div>
+      let status = { animals: [], balance: 0 };
+      let timers = {};
 
-<div id="toast-container"></div>
-<script src="/js/api.js"></script>
-<script>
-const ANIMALS = {
-  ayam:   { icon:'🐔', name:'Ayam Kampung', beli:50000,    jual:250000,   durasi:2,  label:'2 jam' },
-  gurame: { icon:'🐟', name:'Ikan Gurame',  beli:200000,   jual:1000000,  durasi:4,  label:'4 jam' },
-  kambing:{ icon:'🐐', name:'Kambing Etawa',beli:3000000,  jual:15000000, durasi:8,  label:'8 jam' },
-  sapi:   { icon:'🐄', name:'Sapi Brahma',  beli:15000000, jual:75000000, durasi:24, label:'24 jam' },
-  kuda:   { icon:'🐎', name:'Kuda Pacu',    beli:40000000, jual:200000000,durasi:48, label:'48 jam' },
-  unta:   { icon:'🐫', name:'Unta Arab',    beli:80000000, jual:400000000,durasi:72, label:'72 jam' },
-};
+      function fmtTime(ms) {
+        if (ms <= 0) return "✅ SIAP JUAL";
+        const m = Math.floor(ms / 60000),
+          h = Math.floor(m / 60),
+          d = Math.floor(h / 24);
+        if (d > 0) return `${d}h ${h % 24}j ${m % 60}m`;
+        if (h > 0) return `${h}j ${m % 60}m`;
+        return `${m}m`;
+      }
 
-let status = { animals:[], balance:0 };
-let timers = {};
+      async function load() {
+        try {
+          const r = await api.get("/features/ternak");
+          status = r;
+          const balance = r.balance || 0;
+          document.getElementById("top-balance").textContent =
+            "Rp" + fmt(balance);
+          document.getElementById("stat-balance").textContent =
+            "Rp" + fmt(balance);
+          document.getElementById("stat-total").textContent = (
+            r.animals || []
+          ).reduce((s, a) => s + a.qty, 0);
+          const readyCount = (r.animals || [])
+            .filter((a) => Date.now() >= (a.readyAt || 0))
+            .reduce((s, a) => s + a.qty, 0);
+          document.getElementById("stat-ready").textContent = readyCount;
+          const slotCount = (r.animals || []).reduce((s, a) => s + a.qty, 0);
+          document.getElementById("stat-slots").textContent = slotCount + "/8";
+          const estProfit = (r.animals || []).reduce((s, a) => {
+            const ad = ANIMALS[a.animal];
+            return s + (ad ? (ad.jual - ad.beli) * a.qty : 0);
+          }, 0);
+          document.getElementById("stat-profit").textContent =
+            "Rp" + fmt(estProfit);
+          renderKandang();
+          renderShop();
+          renderPanduan();
+        } catch (e) {
+          showToast("error", "Gagal memuat data ternak");
+        }
+      }
 
-const fmt = n => Math.floor(n).toLocaleString('id-ID');
-function fmtTime(ms){
-  if(ms<=0) return '✅ SIAP JUAL';
-  const m=Math.floor(ms/60000),h=Math.floor(m/60),d=Math.floor(h/24);
-  if(d>0) return `${d}h ${h%24}j ${m%60}m`;
-  if(h>0) return `${h}j ${m%60}m`;
-  return `${m}m`;
-}
-
-async function load(){
-  try{
-    const r = await api.get('/features/ternak');
-    status = r;
-    const balance = r.balance||0;
-    document.getElementById('top-balance').textContent='Rp'+fmt(balance);
-    document.getElementById('stat-balance').textContent='Rp'+fmt(balance);
-    document.getElementById('stat-total').textContent=(r.animals||[]).reduce((s,a)=>s+a.qty,0);
-    const readyCount=(r.animals||[]).filter(a=>Date.now()>=(a.readyAt||0)).reduce((s,a)=>s+a.qty,0);
-    document.getElementById('stat-ready').textContent=readyCount;
-    const slotCount=(r.animals||[]).reduce((s,a)=>s+a.qty,0);
-    document.getElementById('stat-slots').textContent=slotCount+'/8';
-    const estProfit=(r.animals||[]).reduce((s,a)=>{
-      const ad=ANIMALS[a.animal];
-      return s+(ad?(ad.jual-ad.beli)*a.qty:0);
-    },0);
-    document.getElementById('stat-profit').textContent='Rp'+fmt(estProfit);
-    renderKandang();
-    renderShop();
-    renderPanduan();
-  }catch(e){ showToast('error','Gagal memuat data ternak'); }
-}
-
-function renderKandang(){
-  const el=document.getElementById('kandang-list');
-  const animals=status.animals||[];
-  if(!animals.length){ el.innerHTML='<div class="alert alert-info">Kandang kosong. Beli hewan dulu!</div>'; return; }
-  el.innerHTML=animals.map((a,i)=>{
-    const ad=ANIMALS[a.animal]||{};
-    const left=a.readyAt-Date.now();
-    const ready=left<=0;
-    const profit=(ad.jual-ad.beli)*a.qty;
-    return `
+      function renderKandang() {
+        const el = document.getElementById("kandang-list");
+        const animals = status.animals || [];
+        if (!animals.length) {
+          el.innerHTML =
+            '<div class="alert alert-info">Kandang kosong. Beli hewan dulu!</div>';
+          return;
+        }
+        el.innerHTML = animals
+          .map((a, i) => {
+            const ad = ANIMALS[a.animal] || {};
+            const left = a.readyAt - Date.now();
+            const ready = left <= 0;
+            const profit = (ad.jual - ad.beli) * a.qty;
+            return `
     <div class="hewan-item">
       <div style="display:flex;align-items:center;gap:14px">
-        <span style="font-size:36px">${ad.icon||'🐄'}</span>
+        <span style="font-size:36px">${ad.icon || "🐄"}</span>
         <div>
-          <div style="font-weight:700;font-size:15px">${ad.name||a.animal} × ${a.qty}</div>
-          <div class="${ready?'timer-ready':'timer-wait'}" id="timer-a-${i}">
-            ${ready?'✅ SIAP JUAL!':'⏳ '+fmtTime(left)}
+          <div style="font-weight:700;font-size:15px">${ad.name || a.animal} × ${a.qty}</div>
+          <div class="${ready ? "timer-ready" : "timer-wait"}" id="timer-a-${i}">
+            ${ready ? "✅ SIAP JUAL!" : "⏳ " + fmtTime(left)}
           </div>
           <span class="profit-badge">Est. Profit: +Rp${fmt(profit)}</span>
         </div>
       </div>
-      ${ready?`<button class="btn btn-primary btn-sm" onclick="jual()">💰 Jual</button>`:`<span style="font-size:12px;color:var(--text-secondary)">${ad.label||''}</span>`}
+      ${ready ? `<button class="btn btn-primary btn-sm" onclick="jual()">💰 Jual</button>` : `<span style="font-size:12px;color:var(--text-secondary)">${ad.label || ""}</span>`}
     </div>`;
-  }).join('');
+          })
+          .join("");
 
-  animals.forEach((a,i)=>{
-    if(a.readyAt>Date.now()){
-      clearInterval(timers['a-'+i]);
-      timers['a-'+i]=setInterval(()=>{
-        const el2=document.getElementById(`timer-a-${i}`);
-        if(!el2){clearInterval(timers['a-'+i]);return;}
-        const left2=a.readyAt-Date.now();
-        if(left2<=0){el2.textContent='✅ SIAP JUAL!';el2.className='timer-ready';clearInterval(timers['a-'+i]);}
-        else el2.textContent='⏳ '+fmtTime(left2);
-      },5000);
-    }
-  });
-}
+        animals.forEach((a, i) => {
+          if (a.readyAt > Date.now()) {
+            clearInterval(timers["a-" + i]);
+            timers["a-" + i] = setInterval(() => {
+              const el2 = document.getElementById(`timer-a-${i}`);
+              if (!el2) {
+                clearInterval(timers["a-" + i]);
+                return;
+              }
+              const left2 = a.readyAt - Date.now();
+              if (left2 <= 0) {
+                el2.textContent = "✅ SIAP JUAL!";
+                el2.className = "timer-ready";
+                clearInterval(timers["a-" + i]);
+              } else el2.textContent = "⏳ " + fmtTime(left2);
+            }, 5000);
+          }
+        });
+      }
 
-function renderShop(){
-  const el=document.getElementById('animal-shop-grid');
-  const animals=status.animals||[];
-  const slotCount=animals.reduce((s,a)=>s+a.qty,0);
-  const maxSlots=8;
-  el.innerHTML=Object.entries(ANIMALS).map(([key,a])=>`
+      function renderShop() {
+        const el = document.getElementById("animal-shop-grid");
+        const animals = status.animals || [];
+        const slotCount = animals.reduce((s, a) => s + a.qty, 0);
+        const maxSlots = 8;
+        el.innerHTML = Object.entries(ANIMALS)
+          .map(
+            ([key, a]) => `
     <div class="animal-card">
       <div class="animal-icon">${a.icon}</div>
       <div style="font-weight:700;font-size:16px;margin-bottom:6px">${a.name}</div>
       <div style="font-size:12px;color:var(--text-secondary);line-height:1.8;margin-bottom:12px">
         💰 Beli: <b>Rp${fmt(a.beli)}</b><br>
         💵 Jual: <b>Rp${fmt(a.jual)}</b><br>
-        📈 Profit: <b style="color:var(--accent-green)">+Rp${fmt(a.jual-a.beli)}</b><br>
+        📈 Profit: <b style="color:var(--accent-green)">+Rp${fmt(a.jual - a.beli)}</b><br>
         ⏱️ Waktu: <b>${a.label}</b>
       </div>
       <div class="qty-row">
         <span style="font-size:12px">Qty:</span>
-        <input type="number" class="qty-input" id="qty-${key}" min="1" value="1" max="${Math.max(1,maxSlots-slotCount)}">
+        <input type="number" class="qty-input" id="qty-${key}" min="1" value="1" max="${Math.max(1, maxSlots - slotCount)}">
       </div>
-      ${slotCount>=maxSlots?`<div class="alert alert-info" style="margin:0;padding:8px 12px;font-size:12px">📦 Kandang penuh (${slotCount}/8)</div>`:`<button class="btn btn-primary btn-block btn-sm" onclick="beli('${key}')">🐄 Beli</button>`}
+      ${slotCount >= maxSlots ? `<div class="alert alert-info" style="margin:0;padding:8px 12px;font-size:12px">📦 Kandang penuh (${slotCount}/8)</div>` : `<button class="btn btn-primary btn-block btn-sm" onclick="beli('${key}')">🐄 Beli</button>`}
     </div>
-  `).join('');
-}
+  `,
+          )
+          .join("");
+      }
 
-function renderPanduan(){
-  const el=document.getElementById('profit-table');
-  el.innerHTML=Object.entries(ANIMALS).map(([k,a])=>`
+      function renderPanduan() {
+        const el = document.getElementById("profit-table");
+        el.innerHTML = Object.entries(ANIMALS)
+          .map(
+            ([k, a]) => `
     <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;background:var(--hover-bg);border-radius:8px;margin-bottom:6px">
       <span>${a.icon} ${a.name}</span>
       <span style="font-size:12px;color:var(--text-secondary)">${a.label}</span>
-      <span style="font-weight:700;color:var(--accent-green)">+Rp${fmt(a.jual-a.beli)}</span>
-    </div>`).join('');
-}
+      <span style="font-weight:700;color:var(--accent-green)">+Rp${fmt(a.jual - a.beli)}</span>
+    </div>`,
+          )
+          .join("");
+      }
 
-async function beli(animal){
-  const qty=parseInt(document.getElementById(`qty-${animal}`).value)||1;
-  try{
-    const r=await api.post('/features/ternak/beli',{animal,qty});
-    showToast('success',r.message); load();
-  }catch(e){ showToast('error',e.message||'Gagal beli'); }
-}
-async function beriPakan(){
-  try{
-    const r=await api.post('/features/ternak/pakan',{});
-    showToast('success',r.message); load();
-  }catch(e){ showToast('error',e.message||'Gagal beri pakan'); }
-}
-async function jual(){
-  try{
-    const r=await api.post('/features/ternak/jual',{});
-    showToast('success',r.message); load();
-  }catch(e){ showToast('error',e.message||'Gagal jual'); }
-}
-async function jualSemua(){ await jual(); }
+      async function beli(animal) {
+        const qty =
+          parseInt(document.getElementById(`qty-${animal}`).value) || 1;
+        try {
+          const r = await api.post("/features/ternak/beli", { animal, qty });
+          showToast("success", r.message);
+          load();
+        } catch (e) {
+          showToast("error", e.message || "Gagal beli");
+        }
+      }
+      async function beriPakan() {
+        try {
+          const r = await api.post("/features/ternak/pakan", {});
+          showToast("success", r.message);
+          load();
+        } catch (e) {
+          showToast("error", e.message || "Gagal beri pakan");
+        }
+      }
+      async function jual() {
+        try {
+          const r = await api.post("/features/ternak/jual", {});
+          showToast("success", r.message);
+          load();
+        } catch (e) {
+          showToast("error", e.message || "Gagal jual");
+        }
+      }
+      async function jualSemua() {
+        await jual();
+      }
 
-function switchTab(tab){
-  ['kandang','pasar-hewan','panduan'].forEach(t=>{
-    document.getElementById(`tab-${t}`).classList.toggle('hidden',t!==tab);
-  });
-  document.querySelectorAll('.tab').forEach((el,i)=>{
-    el.classList.toggle('active',['kandang','pasar-hewan','panduan'][i]===tab);
-  });
-}
+      function switchTab(tab) {
+        ["kandang", "pasar-hewan", "panduan"].forEach((t) => {
+          document
+            .getElementById(`tab-${t}`)
+            .classList.toggle("hidden", t !== tab);
+        });
+        document.querySelectorAll(".tab").forEach((el, i) => {
+          el.classList.toggle(
+            "active",
+            ["kandang", "pasar-hewan", "panduan"][i] === tab,
+          );
+        });
+      }
 
-const ME=getUser();
-if(ME){
-  document.getElementById('sidebar-username').textContent=ME.username;
-  document.getElementById('sidebar-avatar').textContent=ME.username[0].toUpperCase();
-  document.getElementById('sidebar-role').textContent=ME.role||'user';
-  if(ME.role==='admin'||ME.role==='developer') document.querySelectorAll('.admin-only').forEach(el=>el.classList.remove('hidden'));
-}
-load();
-setInterval(load,30000);
-</script>
-</body>
+      const ME = getUser();
+      if (ME) {
+        document.getElementById("sidebar-username").textContent = ME.username;
+        document.getElementById("sidebar-avatar").textContent =
+          ME.username[0].toUpperCase();
+        document.getElementById("sidebar-role").textContent = ME.role || "user";
+        if (ME.role === "admin" || ME.role === "developer")
+          document
+            .querySelectorAll(".admin-only")
+            .forEach((el) => el.classList.remove("hidden"));
+      }
+      load();
+      setInterval(load, 30000);
+    </script>
+  </body>
 </html>
