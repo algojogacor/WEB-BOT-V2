@@ -1,5 +1,6 @@
 // ============================================================
 //  server.js — ALGOJO WEB - Entry Point Utama
+//  Supports both local development AND Vercel serverless
 //  Untuk modifikasi: buka file ini lalu sesuaikan middleware/route
 // ============================================================
 
@@ -15,11 +16,10 @@ const xssClean = require("xss-clean");
 const { connectDB } = require("./config/database");
 const { globalLimiter } = require("./middleware/rateLimiter");
 const routes = require("./routes/index");
-const initSocket = require("./socket/index");
-const lifeService = require("./services/lifeService");
+
+const IS_VERCEL = !!process.env.VERCEL;
 
 const app = express();
-const server = http.createServer(app);
 
 // ── 1. Security Middleware ────────────────────────────────────
 app.use(
@@ -46,18 +46,32 @@ app.use(globalLimiter); // Rate limit global
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 
-// ── 3. Static Files ───────────────────────────────────────────
+// ── 3. Database Connection Middleware (for Vercel cold starts) ─
+// Ensures MongoDB is connected before any request is processed.
+// On local dev, boot() already calls connectDB(), but this is a
+// safety net for serverless environments where boot() doesn't run.
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error("❌ DB connection failed:", err.message);
+    next(err);
+  }
+});
+
+// ── 4. Static Files ───────────────────────────────────────────
 app.use(express.static(path.join(__dirname, "public")));
 
-// ── 4. API Routes ─────────────────────────────────────────────
+// ── 5. API Routes ─────────────────────────────────────────────
 app.use("/api", routes);
 
-// ── 5. SPA Catch-all (kirim index.html untuk semua route lain) ─
+// ── 6. SPA Catch-all (kirim index.html untuk semua route lain) ─
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// ── 6. Error Handler ─────────────────────────────────────────
+// ── 7. Error Handler ─────────────────────────────────────────
 app.use((err, req, res, next) => {
   console.error("❌ Server Error:", err.stack);
   res.status(err.status || 500).json({
@@ -69,31 +83,41 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ── 7. Boot ──────────────────────────────────────────────────
-const PORT = process.env.PORT || 3000;
+// ── 8. Boot (Local Development Only) ─────────────────────────
+// On Vercel, the app is imported by api/index.js — no need to listen.
+if (!IS_VERCEL) {
+  const server = http.createServer(app);
+  const PORT = process.env.PORT || 3000;
 
-async function boot() {
-  try {
-    // Koneksi database
-    await connectDB();
-    console.log("✅ Database terhubung");
+  async function boot() {
+    try {
+      // Koneksi database
+      await connectDB();
+      console.log("✅ Database terhubung");
 
-    // Inisialisasi Socket.io untuk Live Chat
-    initSocket(server);
-    console.log("✅ Socket.IO aktif");
+      // Inisialisasi Socket.io untuk Live Chat (local only)
+      const initSocket = require("./socket/index");
+      initSocket(server);
+      console.log("✅ Socket.IO aktif");
 
-    // Mulai cron life system (HP/Lapar/Energi berkurang setiap menit)
-    // lifeService.startLifeCron();
-    // console.log('✅ Life System (Cron) berjalan');
+      // Mulai cron life system (HP/Lapar/Energi berkurang setiap menit)
+      // lifeService.startLifeCron();
+      // console.log('✅ Life System (Cron) berjalan');
 
-    server.listen(PORT, () => {
-      console.log(`\n🚀 ALGOJO WEB berjalan di http://localhost:${PORT}`);
-      console.log(`   Mode: ${process.env.NODE_ENV || "development"}\n`);
-    });
-  } catch (err) {
-    console.error("💥 Gagal boot:", err.message);
-    process.exit(1);
+      server.listen(PORT, () => {
+        console.log(`\n🚀 ALGOJO WEB berjalan di http://localhost:${PORT}`);
+        console.log(`   Mode: ${process.env.NODE_ENV || "development"}\n`);
+      });
+    } catch (err) {
+      console.error("💥 Gagal boot:", err.message);
+      process.exit(1);
+    }
   }
+
+  boot();
+} else {
+  console.log("☁️  Running on Vercel (serverless mode)");
 }
 
-boot();
+// ── Export app for Vercel ─────────────────────────────────────
+module.exports = app;

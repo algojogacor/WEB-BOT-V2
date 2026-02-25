@@ -1,2 +1,9 @@
 node_modules
 .env
+
+# Vercel
+.vercel
+
+# Legacy bot files (large, not needed for deployment)
+BOT-WA-1-main/
+bot-wa.zip
