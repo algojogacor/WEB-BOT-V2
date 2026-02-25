@@ -51,7 +51,9 @@ async function saveU(username, u, source) {
 async function getStatus(req, res) {
     const { username } = req.user;
     const { data: u }  = getUserGameData(username);
-    if (!u.pabrik) u.pabrik = { machines: {}, inventory: {} };
+    if (!u.pabrik)          u.pabrik = {};
+if (!u.pabrik.machines) u.pabrik.machines = {};
+if (!u.pabrik.inventory) u.pabrik.inventory = {};
 
     const now = Date.now();
     const machineStatus = Object.entries(u.pabrik.machines || {}).map(([id, m]) => ({
@@ -90,7 +92,9 @@ async function buyMachine(req, res) {
     const machine = MACHINES[machineId];
     if (!machine) return res.status(400).json({ success: false, message: '❌ ID mesin tidak valid.' });
 
-    if (!u.pabrik) u.pabrik = { machines: {}, inventory: {} };
+if (!u.pabrik)          u.pabrik = {};
+if (!u.pabrik.machines) u.pabrik.machines = {};
+if (!u.pabrik.inventory) u.pabrik.inventory = {};
     if (u.pabrik.machines[machineId]) return res.status(400).json({ success: false, message: '❌ Mesin sudah dimiliki.' });
     if ((u.balance || 0) < machine.cost) return res.status(400).json({ success: false, message: `❌ Saldo kurang! Butuh Rp${fmt(machine.cost)}.` });
 
@@ -112,7 +116,9 @@ async function craft(req, res) {
     const recipe = RECIPES[inputCode];
     if (!recipe) return res.status(400).json({ success: false, message: '❌ Resep tidak ditemukan.' });
 
-    if (!u.pabrik) u.pabrik = { machines: {}, inventory: {} };
+    if (!u.pabrik)          u.pabrik = {};
+if (!u.pabrik.machines) u.pabrik.machines = {};
+if (!u.pabrik.inventory) u.pabrik.inventory = {};
     if (!u.pabrik.machines[recipe.machine]) return res.status(400).json({ success: false, message: `❌ Kamu belum punya mesin ${MACHINES[recipe.machine]?.name}.` });
 
     const now = Date.now();
@@ -182,7 +188,9 @@ async function addToInventory(req, res) {
 
     if (!itemCode || isNaN(qty) || qty <= 0) return res.status(400).json({ success: false, message: '❌ Data tidak valid.' });
 
-    if (!u.pabrik) u.pabrik = { machines: {}, inventory: {} };
+    if (!u.pabrik)          u.pabrik = {};
+if (!u.pabrik.machines) u.pabrik.machines = {};
+if (!u.pabrik.inventory) u.pabrik.inventory = {};
     u.pabrik.inventory[itemCode] = (u.pabrik.inventory[itemCode] || 0) + qty;
     await saveU(username, u, source);
 
