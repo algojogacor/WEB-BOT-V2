@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AlgojoGacor — Bank & Transfer</title>
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <style>
+      .bank-hero {
+        background: linear-gradient(135deg, #0a1628, #0d2137, #0a1a2e);
+        border: 1px solid rgba(76, 201, 240, 0.3);
+        border-radius: 16px;
+        padding: 24px 28px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      .bank-hero-title { font-size: 22px; font-weight: 800; color: var(--accent-blue); }
+      .bank-hero-sub   { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+      .balance-group   { display: flex; gap: 24px; flex-wrap: wrap; }
+      .bal-box { text-align: right; }
+      .bal-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; }
+      .bal-value { font-size: 20px; font-weight: 700; color: var(--accent-green); }
+      .bal-value.debt { color: var(--accent); }
+
+      .tabs { display:flex; gap:4px; margin-bottom:20px; border-bottom:2px solid var(--border); }
+      .tab  { padding:10px 20px; cursor:pointer; border-radius:8px 8px 0 0; font-weight:600; font-size:13px;
+              color:var(--text-secondary); border-bottom:2px solid transparent; margin-bottom:-2px; transition:all 0.2s; }
+      .tab.active { color:var(--accent-blue); border-bottom-color:var(--accent-blue); background:rgba(76,201,240,0.08); }
+      .tab-pane   { display:none; }
+      .tab-pane.active { display:block; }
+
+      .quick-amounts { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+      .quick-btn { padding:5px 14px; border-radius:20px; border:1px solid var(--border);
+                   background:var(--bg-hover); color:var(--text-secondary); cursor:pointer;
+                   font-size:12px; font-weight:600; transition:all 0.2s; }
+      .quick-btn:hover { border-color:var(--accent-blue); color:var(--accent-blue); }
+
+      .rob-target-list { display:flex; flex-direction:column; gap:8px; }
+      .rob-item { display:flex; align-items:center; justify-content:space-between;
+                  padding:12px 16px; background:var(--bg-hover); border-radius:10px; border:1px solid var(--border); }
+      .info-row { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px; }
+      .info-chip { background:var(--bg-hover); border:1px solid var(--border); border-radius:8px; padding:8px 14px; font-size:13px; }
+      .info-chip span { color:var(--accent-yellow); font-weight:700; }
+    </style>
+  </head>
+  <body>
+    <div class="app-layout">
+      <script src="/js/api.js"></script>
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <span class="logo-icon">⚔️</span>
+          <div><div class="logo-text">AlgojoGacor</div></div>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section">Utama</div>
+          <a class="nav-item" href="/dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a>
+          <a class="nav-item" href="/pages/profile.html"><span class="nav-icon">👤</span> Profil & Status</a>
+          <a class="nav-item" href="/chat.html"><span class="nav-icon">💬</span> Live Chat</a>
+          <div class="nav-section">Kehidupan & Ekonomi</div>
+          <a class="nav-item" href="/pages/economy.html"><span class="nav-icon">💰</span> Ekonomi & Bank</a>
+          <a class="nav-item active" href="/pages/bank.html"><span class="nav-icon">🏦</span> Bank & Rob</a>
+          <a class="nav-item" href="/pages/jobs.html"><span class="nav-icon">💼</span> Pekerjaan</a>
+          <a class="nav-item" href="/pages/life.html"><span class="nav-icon">❤️</span> Survival</a>
+          <div class="nav-section">Investasi</div>
+          <a class="nav-item" href="/pages/stocks.html"><span class="nav-icon">📈</span> Saham IDX</a>
+          <a class="nav-item" href="/pages/valas.html"><span class="nav-icon">💱</span> Valas & Emas</a>
+          <a class="nav-item" href="/pages/crypto.html"><span class="nav-icon">₿</span> Crypto</a>
+          <div class="nav-section">Games</div>
+          <a class="nav-item" href="/pages/games.html"><span class="nav-icon">🎮</span> Casino & Games</a>
+          <a class="nav-item" href="/pages/minigames.html"><span class="nav-icon">🎲</span> Mini Games</a>
+          <a class="nav-item" href="/pages/battle.html"><span class="nav-icon">⚔️</span> PvP Battle</a>
+          <div class="nav-section">Bisnis</div>
+          <a class="nav-item" href="/pages/farming.html"><span class="nav-icon">🌾</span> Farming</a>
+          <a class="nav-item" href="/pages/ternak.html"><span class="nav-icon">🐄</span> Peternakan</a>
+          <a class="nav-item" href="/pages/pabrik.html"><span class="nav-icon">🏭</span> Pabrik</a>
+          <a class="nav-item" href="/pages/mining.html"><span class="nav-icon">⛏️</span> Mining</a>
+          <a class="nav-item" href="/pages/property.html"><span class="nav-icon">🏢</span> Properti</a>
+          <div class="nav-section">AI & Tools</div>
+          <a class="nav-item" href="/pages/ai.html"><span class="nav-icon">🤖</span> AI Chat</a>
+          <a class="nav-item" href="/pages/tools.html"><span class="nav-icon">🛠️</span> Tools</a>
+          <a class="nav-item" href="/pages/leaderboard.html"><span class="nav-icon">🏆</span> Leaderboard</a>
+          <div class="nav-section admin-only hidden">Admin</div>
+          <a class="nav-item admin-only hidden" href="/pages/admin.html"><span class="nav-icon">⚙️</span> Panel Admin</a>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="user-info">
+            <div class="user-avatar" id="sidebar-avatar">?</div>
+            <div>
+              <div class="user-name" id="sidebar-username">Loading...</div>
+              <div class="user-role" id="sidebar-role">—</div>
+            </div>
+          </div>
+          <button class="btn btn-secondary btn-block btn-sm" onclick="logout()">🚪 Logout</button>
+        </div>
+      </aside>
+
+      <div class="main-content">
+        <header class="topbar">
+          <div style="display:flex;align-items:center;gap:12px">
+            <button class="hamburger" onclick="toggleSidebar()">☰</button>
+            <span class="topbar-title">🏦 Bank & Transfer</span>
+          </div>
+          <div style="font-size:13px;color:var(--text-secondary)">
+            Saldo: <span id="top-balance" style="font-weight:700;color:var(--accent-green)">—</span>
+          </div>
+        </header>
+
+        <main class="content-area">
+          <!-- Hero Saldo -->
+          <div class="bank-hero">
+            <div>
+              <div class="bank-hero-title">🏦 Bank Arya</div>
+              <div class="bank-hero-sub">Kelola saldo, transfer, pinjam, dan rampok dengan bijak</div>
+            </div>
+            <div class="balance-group">
+              <div class="bal-box">
+                <div class="bal-label">💳 Dompet</div>
+                <div class="bal-value" id="hero-wallet">—</div>
+              </div>
+              <div class="bal-box">
+                <div class="bal-label">🏦 Bank</div>
+                <div class="bal-value" id="hero-bank">—</div>
+              </div>
+              <div class="bal-box">
+                <div class="bal-label">📉 Utang</div>
+                <div class="bal-value debt" id="hero-debt">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Info Baris -->
+          <div class="info-row">
+            <div class="info-chip">📅 Limit Transfer Harian: <span id="info-limit">—</span></div>
+            <div class="info-chip">✅ Terpakai: <span id="info-used">—</span></div>
+          </div>
+
+          <!-- Tabs -->
+          <div class="tabs">
+            <div class="tab active" onclick="switchTab('deposit')">⬇️ Deposit</div>
+            <div class="tab" onclick="switchTab('withdraw')">⬆️ Tarik</div>
+            <div class="tab" onclick="switchTab('transfer')">💳 Transfer</div>
+            <div class="tab" onclick="switchTab('pinjam')">🤝 Pinjam</div>
+            <div class="tab" onclick="switchTab('bayar')">💸 Bayar Utang</div>
+            <div class="tab" onclick="switchTab('rob')">🥷 Rob</div>
+          </div>
+
+          <!-- Deposit -->
+          <div id="pane-deposit" class="tab-pane active">
+            <div class="card">
+              <div class="card-header"><span class="icon">⬇️</span><h3>Deposit ke Bank</h3></div>
+              <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">Simpan uang dari dompet ke bank. Cooldown 10 menit tiap transaksi.</p>
+              <div class="form-group">
+                <label>Jumlah (atau ketik "all")</label>
+                <input type="text" class="form-input" id="dep-amount" placeholder="Contoh: 5000000 atau all" />
+                <div class="quick-amounts">
+                  <button class="quick-btn" onclick="setAmt('dep-amount','1000000')">1 Jt</button>
+                  <button class="quick-btn" onclick="setAmt('dep-amount','10000000')">10 Jt</button>
+                  <button class="quick-btn" onclick="setAmt('dep-amount','100000000')">100 Jt</button>
+                  <button class="quick-btn" onclick="setAmt('dep-amount','1000000000')">1 M</button>
+                  <button class="quick-btn" onclick="setAmt('dep-amount','all')">All</button>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-block" onclick="bankAction('deposit')">⬇️ Deposit Sekarang</button>
+            </div>
+          </div>
+
+          <!-- Withdraw -->
+          <div id="pane-withdraw" class="tab-pane">
+            <div class="card">
+              <div class="card-header"><span class="icon">⬆️</span><h3>Tarik dari Bank</h3></div>
+              <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">Ambil uang dari bank ke dompet. Cooldown 10 menit tiap transaksi.</p>
+              <div class="form-group">
+                <label>Jumlah (atau ketik "all")</label>
+                <input type="text" class="form-input" id="wd-amount" placeholder="Contoh: 5000000 atau all" />
+                <div class="quick-amounts">
+                  <button class="quick-btn" onclick="setAmt('wd-amount','1000000')">1 Jt</button>
+                  <button class="quick-btn" onclick="setAmt('wd-amount','10000000')">10 Jt</button>
+                  <button class="quick-btn" onclick="setAmt('wd-amount','100000000')">100 Jt</button>
+                  <button class="quick-btn" onclick="setAmt('wd-amount','all')">All</button>
+                </div>
+              </div>
+              <button class="btn btn-success btn-block" onclick="bankAction('withdraw')">⬆️ Tarik Sekarang</button>
+            </div>
+          </div>
+
+          <!-- Transfer -->
+          <div id="pane-transfer" class="tab-pane">
+            <div class="card">
+              <div class="card-header"><span class="icon">💳</span><h3>Transfer ke User Lain</h3></div>
+              <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">Pajak transfer 5%. Limit harian Rp10 Miliar.</p>
+              <div class="form-group">
+                <label>Username Tujuan</label>
+                <input type="text" class="form-input" id="tf-target" placeholder="username tujuan" />
+              </div>
+              <div class="form-group">
+                <label>Jumlah</label>
+                <input type="number" class="form-input" id="tf-amount" placeholder="Contoh: 5000000" />
+              </div>
+              <button class="btn btn-primary btn-block" onclick="bankAction('transfer')">💳 Transfer</button>
+            </div>
+          </div>
+
+          <!-- Pinjam -->
+          <div id="pane-pinjam" class="tab-pane">
+            <div class="card">
+              <div class="card-header"><span class="icon">🤝</span><h3>Pinjam Uang</h3></div>
+              <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">Bunga 20%. Maksimal pinjaman Rp5 Miliar. Lunasi utang lama sebelum pinjam lagi.</p>
+              <div class="form-group">
+                <label>Jumlah Pinjaman</label>
+                <input type="number" class="form-input" id="loan-amount" placeholder="Maks: 5.000.000.000" />
+                <div class="quick-amounts">
+                  <button class="quick-btn" onclick="setAmt('loan-amount','100000000')">100 Jt</button>
+                  <button class="quick-btn" onclick="setAmt('loan-amount','500000000')">500 Jt</button>
+                  <button class="quick-btn" onclick="setAmt('loan-amount','1000000000')">1 M</button>
+                  <button class="quick-btn" onclick="setAmt('loan-amount','5000000000')">5 M</button>
+                </div>
+              </div>
+              <div class="alert alert-warning" style="margin-bottom:16px">⚠️ Dengan meminjam, kamu setuju membayar pokok + bunga 20%.</div>
+              <button class="btn btn-primary btn-block" onclick="bankAction('pinjam')">🤝 Ajukan Pinjaman</button>
+            </div>
+          </div>
+
+          <!-- Bayar Utang -->
+          <div id="pane-bayar" class="tab-pane">
+            <div class="card">
+              <div class="card-header"><span class="icon">💸</span><h3>Bayar Utang</h3></div>
+              <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">Cicil atau lunasi utang sekaligus dengan "all".</p>
+              <div id="debt-status" style="margin-bottom:16px"></div>
+              <div class="form-group">
+                <label>Jumlah Pembayaran (atau "all")</label>
+                <input type="text" class="form-input" id="pay-amount" placeholder="Contoh: 1000000 atau all" />
+              </div>
+              <button class="btn btn-danger btn-block" onclick="bankAction('bayar')">💸 Bayar Utang</button>
+            </div>
+          </div>
+
+          <!-- Rob -->
+          <div id="pane-rob" class="tab-pane">
+            <div class="card">
+              <div class="card-header"><span class="icon">🥷</span><h3>Rampok User Lain</h3></div>
+              <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">
+                Berhasil: ambil 20% saldo. Gagal: denda 10% + HP -20.<br>
+                Butuh energi ≥10%. Cooldown 30 menit.
+              </p>
+              <div class="form-group">
+                <label>Username Target</label>
+                <input type="text" class="form-input" id="rob-target" placeholder="username target" />
+              </div>
+              <button class="btn btn-danger btn-block" onclick="bankAction('rob')">🥷 Rob Sekarang</button>
+            </div>
+          </div>
+
+          <div id="bank-result" style="margin-top:16px"></div>
+        </main>
+      </div>
+    </div>
+    <div id="toast-container"></div>
+
+    <script>
+      if (!requireLogin()) throw new Error();
+      const ME = getUser();
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        document.getElementById('sidebar-username').textContent = ME.username;
+        document.getElementById('sidebar-role').textContent     = ME.role;
+        document.getElementById('sidebar-avatar').textContent   = ME.username[0].toUpperCase();
+        await loadStatus();
+      });
+
+      async function loadStatus() {
+        const r = await api.get('/features/bank');
+        if (!r?.success) return;
+        document.getElementById('hero-wallet').textContent  = fmtMoney(r.balance);
+        document.getElementById('hero-bank').textContent    = fmtMoney(r.bank);
+        document.getElementById('hero-debt').textContent    = fmtMoney(r.debt);
+        document.getElementById('top-balance').textContent  = fmtMoney(r.balance);
+        document.getElementById('info-limit').textContent   = fmtMoney(r.dailyLimit);
+        document.getElementById('info-used').textContent    = fmtMoney(r.dailyUsed);
+
+        const debtEl = document.getElementById('debt-status');
+        if (r.debt > 0) {
+          debtEl.innerHTML = `<div class="alert alert-error">📉 Total Utang: <strong>${fmtMoney(r.debt)}</strong></div>`;
+        } else {
+          debtEl.innerHTML = `<div class="alert alert-success">✅ Tidak ada utang.</div>`;
+        }
+      }
+
+      function switchTab(name) {
+        document.querySelectorAll('.tab').forEach((t,i) => {
+          const names = ['deposit','withdraw','transfer','pinjam','bayar','rob'];
+          t.classList.toggle('active', names[i] === name);
+        });
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        document.getElementById(`pane-${name}`).classList.add('active');
+      }
+
+      function setAmt(id, val) { document.getElementById(id).value = val; }
+
+      async function bankAction(action) {
+        let res;
+        if (action === 'deposit') {
+          const a = document.getElementById('dep-amount').value.trim();
+          if (!a) return toastError('Isi jumlah terlebih dahulu.');
+          res = await api.post('/features/bank/deposit', { amount: a });
+        } else if (action === 'withdraw') {
+          const a = document.getElementById('wd-amount').value.trim();
+          if (!a) return toastError('Isi jumlah terlebih dahulu.');
+          res = await api.post('/features/bank/withdraw', { amount: a });
+        } else if (action === 'transfer') {
+          const target = document.getElementById('tf-target').value.trim();
+          const amount = document.getElementById('tf-amount').value;
+          if (!target || !amount) return toastError('Isi username dan jumlah.');
+          res = await api.post('/features/bank/transfer', { target, amount: parseInt(amount) });
+        } else if (action === 'pinjam') {
+          const a = document.getElementById('loan-amount').value;
+          if (!a) return toastError('Isi jumlah pinjaman.');
+          res = await api.post('/features/bank/pinjam', { amount: parseInt(a) });
+        } else if (action === 'bayar') {
+          const a = document.getElementById('pay-amount').value.trim();
+          if (!a) return toastError('Isi jumlah pembayaran.');
+          res = await api.post('/features/bank/bayar', { amount: a });
+        } else if (action === 'rob') {
+          const target = document.getElementById('rob-target').value.trim();
+          if (!target) return toastError('Isi username target.');
+          res = await api.post('/features/bank/rob', { target });
+        }
+        if (!res) return;
+        const resultEl = document.getElementById('bank-result');
+        if (res.success) {
+          toastSuccess(res.message);
+          resultEl.innerHTML = `<div class="alert alert-success">${res.message}</div>`;
+          await loadStatus();
+        } else {
+          toastError(res.message);
+          resultEl.innerHTML = `<div class="alert alert-error">${res.message}</div>`;
+        }
+      }
+    </script>
+  </body>
+</html>

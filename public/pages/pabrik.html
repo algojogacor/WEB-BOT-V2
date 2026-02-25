@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AlgojoGacor — Pabrik</title>
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <style>
+      .factory-hero {
+        background: linear-gradient(135deg, #0d0d00, #1a1500, #120f00);
+        border: 1px solid rgba(255,209,102,0.3);
+        border-radius: 16px;
+        padding: 24px 28px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      .factory-title { font-size: 22px; font-weight: 800; color: var(--accent-yellow); }
+      .factory-sub   { font-size: 13px; color: var(--text-secondary); margin-top:4px; }
+
+      .tabs { display:flex; gap:4px; margin-bottom:20px; border-bottom:2px solid var(--border); overflow-x:auto; }
+      .tab  { padding:10px 20px; cursor:pointer; border-radius:8px 8px 0 0; font-weight:600; font-size:13px;
+              color:var(--text-secondary); border-bottom:2px solid transparent; margin-bottom:-2px; transition:all 0.2s; white-space:nowrap; }
+      .tab.active { color:var(--accent-yellow); border-bottom-color:var(--accent-yellow); background:rgba(255,209,102,0.07); }
+      .tab-pane { display:none; }
+      .tab-pane.active { display:block; }
+
+      .machine-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:12px; }
+      .machine-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        transition: all 0.2s;
+      }
+      .machine-card.owned { border-color: var(--accent-green); }
+      .machine-card.ready { border-color: var(--accent-yellow); }
+      .machine-name { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+      .machine-cost { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+      .machine-status-ready  { font-size: 12px; color: var(--accent-green); font-weight:700; }
+      .machine-status-cd     { font-size: 12px; color: var(--accent-yellow); }
+
+      .recipe-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        background: var(--bg-hover);
+        border-radius: 10px;
+        margin-bottom: 10px;
+        border: 1px solid var(--border);
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .inv-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:10px; }
+      .inv-item {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px;
+        text-align: center;
+      }
+      .inv-qty  { font-size: 22px; font-weight: 800; color: var(--accent-yellow); }
+      .inv-name { font-size: 12px; color: var(--text-muted); margin-top:4px; }
+
+      .flow-arrow { text-align:center; font-size:24px; color:var(--text-muted); margin:0 8px; }
+    </style>
+  </head>
+  <body>
+    <div class="app-layout">
+      <script src="/js/api.js"></script>
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <span class="logo-icon">⚔️</span>
+          <div><div class="logo-text">AlgojoGacor</div></div>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section">Utama</div>
+          <a class="nav-item" href="/dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a>
+          <a class="nav-item" href="/pages/profile.html"><span class="nav-icon">👤</span> Profil & Status</a>
+          <a class="nav-item" href="/chat.html"><span class="nav-icon">💬</span> Live Chat</a>
+          <div class="nav-section">Kehidupan & Ekonomi</div>
+          <a class="nav-item" href="/pages/economy.html"><span class="nav-icon">💰</span> Ekonomi & Bank</a>
+          <a class="nav-item" href="/pages/bank.html"><span class="nav-icon">🏦</span> Bank & Rob</a>
+          <a class="nav-item" href="/pages/jobs.html"><span class="nav-icon">💼</span> Pekerjaan</a>
+          <a class="nav-item" href="/pages/life.html"><span class="nav-icon">❤️</span> Survival</a>
+          <div class="nav-section">Investasi</div>
+          <a class="nav-item" href="/pages/stocks.html"><span class="nav-icon">📈</span> Saham IDX</a>
+          <a class="nav-item" href="/pages/valas.html"><span class="nav-icon">💱</span> Valas & Emas</a>
+          <a class="nav-item" href="/pages/crypto.html"><span class="nav-icon">₿</span> Crypto</a>
+          <div class="nav-section">Games</div>
+          <a class="nav-item" href="/pages/games.html"><span class="nav-icon">🎮</span> Casino & Games</a>
+          <a class="nav-item" href="/pages/minigames.html"><span class="nav-icon">🎲</span> Mini Games</a>
+          <a class="nav-item" href="/pages/battle.html"><span class="nav-icon">⚔️</span> PvP Battle</a>
+          <div class="nav-section">Bisnis</div>
+          <a class="nav-item" href="/pages/farming.html"><span class="nav-icon">🌾</span> Farming</a>
+          <a class="nav-item" href="/pages/ternak.html"><span class="nav-icon">🐄</span> Peternakan</a>
+          <a class="nav-item active" href="/pages/pabrik.html"><span class="nav-icon">🏭</span> Pabrik</a>
+          <a class="nav-item" href="/pages/mining.html"><span class="nav-icon">⛏️</span> Mining</a>
+          <a class="nav-item" href="/pages/property.html"><span class="nav-icon">🏢</span> Properti</a>
+          <div class="nav-section">AI & Tools</div>
+          <a class="nav-item" href="/pages/ai.html"><span class="nav-icon">🤖</span> AI Chat</a>
+          <a class="nav-item" href="/pages/tools.html"><span class="nav-icon">🛠️</span> Tools</a>
+          <a class="nav-item" href="/pages/leaderboard.html"><span class="nav-icon">🏆</span> Leaderboard</a>
+          <div class="nav-section admin-only hidden">Admin</div>
+          <a class="nav-item admin-only hidden" href="/pages/admin.html"><span class="nav-icon">⚙️</span> Panel Admin</a>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="user-info">
+            <div class="user-avatar" id="sidebar-avatar">?</div>
+            <div>
+              <div class="user-name" id="sidebar-username">Loading...</div>
+              <div class="user-role" id="sidebar-role">—</div>
+            </div>
+          </div>
+          <button class="btn btn-secondary btn-block btn-sm" onclick="logout()">🚪 Logout</button>
+        </div>
+      </aside>
+
+      <div class="main-content">
+        <header class="topbar">
+          <div style="display:flex;align-items:center;gap:12px">
+            <button class="hamburger" onclick="toggleSidebar()">☰</button>
+            <span class="topbar-title">🏭 Pabrik Pengolahan</span>
+          </div>
+          <div style="font-size:13px;color:var(--text-secondary)">
+            Saldo: <span id="top-balance" style="font-weight:700;color:var(--accent-green)">—</span>
+          </div>
+        </header>
+
+        <main class="content-area">
+          <div class="factory-hero">
+            <div>
+              <div class="factory-title">🏭 Pabrik Pengolahan</div>
+              <div class="factory-sub">Olah hasil ternak jadi produk premium bernilai tinggi. Butuh bahan baku dari Peternakan!</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:13px;color:var(--text-muted)">Biaya Operasional Per Craft</div>
+              <div style="font-size:18px;font-weight:700;color:var(--accent-yellow)">Rp1.000.000</div>
+            </div>
+          </div>
+
+          <!-- Flow Info -->
+          <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:24px;flex-wrap:wrap;font-size:14px">
+            <span class="badge badge-user">🐄 Ternak (Jual ke Pabrik)</span>
+            <span class="flow-arrow">→</span>
+            <span class="badge badge-user">📦 Inventaris Pabrik</span>
+            <span class="flow-arrow">→</span>
+            <span class="badge badge-user">⚙️ Craft (Gunakan Mesin)</span>
+            <span class="flow-arrow">→</span>
+            <span class="badge badge-admin">💰 Jual Produk</span>
+          </div>
+
+          <div class="tabs">
+            <div class="tab active" onclick="switchTab('mesin')">⚙️ Mesin</div>
+            <div class="tab" onclick="switchTab('craft')">🔧 Craft</div>
+            <div class="tab" onclick="switchTab('inventaris')">📦 Inventaris</div>
+            <div class="tab" onclick="switchTab('jual')">💰 Jual Produk</div>
+          </div>
+
+          <!-- Mesin -->
+          <div id="pane-mesin" class="tab-pane active">
+            <div class="machine-grid" id="machine-grid">
+              <div style="color:var(--text-muted);text-align:center;grid-column:1/-1;padding:32px">⏳ Memuat mesin...</div>
+            </div>
+          </div>
+
+          <!-- Craft -->
+          <div id="pane-craft" class="tab-pane">
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-header"><span class="icon">🔧</span><h3>Craft Produk</h3></div>
+              <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">
+                Pilih input bahan baku sesuai resep. Tiap craft membutuhkan mesin yang sesuai dan bahan di inventaris.
+              </p>
+              <div class="form-group">
+                <label>Kode Bahan Input</label>
+                <input type="text" class="form-input" id="craft-input" placeholder="Contoh: ayam, gurame, nugget" />
+              </div>
+              <div class="form-group">
+                <label>Jumlah Batch</label>
+                <input type="number" class="form-input" id="craft-qty" value="1" min="1" />
+              </div>
+              <button class="btn btn-primary btn-block" onclick="craftAction()">⚙️ Mulai Craft</button>
+            </div>
+
+            <!-- Tabel Resep -->
+            <div class="card">
+              <div class="card-header"><span class="icon">📋</span><h3>Daftar Resep</h3></div>
+              <div id="recipe-list"></div>
+            </div>
+          </div>
+
+          <!-- Inventaris -->
+          <div id="pane-inventaris" class="tab-pane">
+            <div id="inventory-container">
+              <div style="color:var(--text-muted);text-align:center;padding:32px">⏳ Memuat inventaris...</div>
+            </div>
+          </div>
+
+          <!-- Jual -->
+          <div id="pane-jual" class="tab-pane">
+            <div class="card">
+              <div class="card-header"><span class="icon">💰</span><h3>Jual Produk Jadi</h3></div>
+              <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">
+                Harga jual berfluktuasi berdasarkan jam (dinamis). Pajak jual 5%.
+              </p>
+              <div class="form-group">
+                <label>Kode Produk</label>
+                <input type="text" class="form-input" id="jual-code" placeholder="Contoh: nugget, fillet, burger" />
+              </div>
+              <div class="form-group">
+                <label>Jumlah</label>
+                <input type="number" class="form-input" id="jual-qty" value="1" min="1" />
+              </div>
+              <button class="btn btn-success btn-block" onclick="sellProduct()">💰 Jual Sekarang</button>
+            </div>
+          </div>
+
+          <div id="pabrik-result" style="margin-top:16px"></div>
+        </main>
+      </div>
+    </div>
+    <div id="toast-container"></div>
+
+    <script>
+      if (!requireLogin()) throw new Error();
+      const ME = getUser();
+      let statusData = null;
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        document.getElementById('sidebar-username').textContent = ME.username;
+        document.getElementById('sidebar-role').textContent     = ME.role;
+        document.getElementById('sidebar-avatar').textContent   = ME.username[0].toUpperCase();
+        await loadStatus();
+      });
+
+      async function loadStatus() {
+        const r = await api.get('/features/pabrik');
+        if (!r?.success) return;
+        statusData = r;
+        document.getElementById('top-balance').textContent = fmtMoney(r.balance);
+        renderMachines(r);
+        renderRecipes(r.recipes);
+        renderInventory(r.inventory);
+      }
+
+      function renderMachines(r) {
+        const grid = document.getElementById('machine-grid');
+        const now  = Date.now();
+        grid.innerHTML = r.allMachines.map(m => {
+          const owned = m.owned;
+          const ms    = r.machines.find(ms => ms.id === m.id);
+          let statusHtml = '';
+          if (owned) {
+            statusHtml = ms?.ready
+              ? `<div class="machine-status-ready">✅ Siap Dipakai</div>`
+              : `<div class="machine-status-cd">⏳ ${fmtCooldown(ms?.cooldownLeft)}</div>`;
+          }
+          return `
+            <div class="machine-card ${owned ? (ms?.ready ? 'ready' : 'owned') : ''}">
+              <div class="machine-name">${m.name}</div>
+              <div class="machine-cost">Harga: ${fmtMoney(m.cost)}</div>
+              ${statusHtml}
+              ${!owned
+                ? `<button class="btn btn-primary btn-sm btn-block" style="margin-top:10px" onclick="buyMachine('${m.id}')">🛒 Beli Mesin</button>`
+                : `<div style="margin-top:10px;font-size:11px;padding:4px 10px;background:rgba(0,212,170,0.1);border-radius:6px;color:var(--accent-green);text-align:center">✅ Sudah Dimiliki</div>`
+              }
+            </div>`;
+        }).join('');
+      }
+
+      function renderRecipes(recipes) {
+        const el = document.getElementById('recipe-list');
+        el.innerHTML = recipes.map(r => `
+          <div class="recipe-item">
+            <div>
+              <div style="font-weight:700">${r.outputName}</div>
+              <div style="font-size:12px;color:var(--text-muted)">Input: ${r.inputCode} (batch ${r.batch}x) | Mesin: ${r.machine}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="color:var(--accent-yellow);font-size:13px">~${fmtMoney(r.price)}/pcs</div>
+              <button class="btn btn-sm btn-primary" style="margin-top:4px" onclick="quickCraft('${r.inputCode}')">⚙️ Craft</button>
+            </div>
+          </div>`).join('');
+      }
+
+      function renderInventory(inv) {
+        const container = document.getElementById('inventory-container');
+        const entries = Object.entries(inv || {}).filter(([,v]) => v > 0);
+        if (!entries.length) {
+          container.innerHTML = `<div style="text-align:center;padding:32px;color:var(--text-muted)">📦 Inventaris kosong. Masukkan bahan dari Peternakan!</div>`;
+          return;
+        }
+        container.innerHTML = `
+          <div class="inv-grid">
+            ${entries.map(([code, qty]) => `
+              <div class="inv-item">
+                <div class="inv-qty">${fmt(qty)}</div>
+                <div class="inv-name">${code}</div>
+                <button class="btn btn-sm btn-danger" style="margin-top:8px;width:100%" onclick="quickSell('${code}')">Jual</button>
+              </div>`).join('')}
+          </div>`;
+      }
+
+      function fmtCooldown(ms) {
+        if (!ms || ms <= 0) return 'Siap';
+        const m = Math.floor(ms / 60000);
+        const s = Math.floor((ms % 60000) / 1000);
+        return m > 0 ? `${m} menit ${s} dtk` : `${s} detik`;
+      }
+
+      function quickCraft(inputCode) {
+        document.getElementById('craft-input').value = inputCode;
+        switchTab('craft');
+      }
+
+      function quickSell(code) {
+        document.getElementById('jual-code').value = code;
+        switchTab('jual');
+      }
+
+      async function buyMachine(machineId) {
+        const res = await api.post('/features/pabrik/buy-machine', { machineId });
+        showResult(res);
+        if (res?.success) await loadStatus();
+      }
+
+      async function craftAction() {
+        const inputCode = document.getElementById('craft-input').value.trim();
+        const qty       = document.getElementById('craft-qty').value;
+        if (!inputCode) return toastError('Isi kode bahan input.');
+        const res = await api.post('/features/pabrik/craft', { inputCode, qty: parseInt(qty) });
+        showResult(res);
+        if (res?.success) { await loadStatus(); renderInventory(res.inventory); }
+      }
+
+      async function sellProduct() {
+        const outputCode = document.getElementById('jual-code').value.trim();
+        const qty        = document.getElementById('jual-qty').value;
+        if (!outputCode) return toastError('Isi kode produk.');
+        const res = await api.post('/features/pabrik/sell', { outputCode, qty: parseInt(qty) });
+        showResult(res);
+        if (res?.success) await loadStatus();
+      }
+
+      function showResult(res) {
+        const el = document.getElementById('pabrik-result');
+        if (!res) return;
+        if (res.success) { toastSuccess(res.message); el.innerHTML = `<div class="alert alert-success">${res.message}</div>`; }
+        else { toastError(res.message); el.innerHTML = `<div class="alert alert-error">${res.message}</div>`; }
+      }
+
+      function switchTab(name) {
+        const tabs = ['mesin','craft','inventaris','jual'];
+        document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i] === name));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        document.getElementById(`pane-${name}`).classList.add('active');
+        if (name === 'inventaris' && statusData) renderInventory(statusData.inventory);
+      }
+    </script>
+  </body>
+</html>

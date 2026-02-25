@@ -186,6 +186,23 @@ const ROULETTE_NUMBERS = [
 const TRIVIA_REWARD = 1_000_000;
 const TRIVIA_PENALTY = 500_000;
 
+// ── Stocks ────────────────────────────────────────────────────
+const STOCK_TICKERS = ['BBCA','BBRI','BMRI','TLKM','ASII','UNTR','GOTO','ANTM','ADRO','BREN'];
+
+// ── Valas ─────────────────────────────────────────────────────
+const VALAS_CURRENCIES = ['usd','eur','sgd','myr','jpy','gbp','cny','sar','aud','emas'];
+
+// ── Bank ──────────────────────────────────────────────────────
+const BANK = {
+    COOLDOWN_MS:    10 * 60 * 1000,
+    TRANSFER_TAX:   0.05,
+    DAILY_LIMIT:    10_000_000_000,
+    MAX_LOAN:       5_000_000_000,
+    INTEREST_RATE:  0.20,
+    ROB_COOLDOWN_MS: 30 * 60 * 1000,
+    ROB_SUCCESS:    0.40,
+};
+
 module.exports = {
   ECONOMY,
   LIFE,
@@ -206,4 +223,7 @@ module.exports = {
   ROULETTE_NUMBERS,
   TRIVIA_REWARD,
   TRIVIA_PENALTY,
+  STOCK_TICKERS,
+  VALAS_CURRENCIES,
+  BANK,
 };

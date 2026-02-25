@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AlgojoGacor — Valas & Emas</title>
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <style>
+      .forex-hero {
+        background: linear-gradient(135deg, #1a1500, #1f1a00, #141400);
+        border: 1px solid rgba(255,209,102,0.3);
+        border-radius: 16px;
+        padding: 24px 28px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      .forex-title { font-size: 22px; font-weight: 800; color: var(--accent-yellow); }
+      .forex-sub   { font-size: 13px; color: var(--text-secondary); margin-top:4px; }
+
+      .tabs { display:flex; gap:4px; margin-bottom:20px; border-bottom:2px solid var(--border); overflow-x:auto; }
+      .tab  { padding:10px 20px; cursor:pointer; border-radius:8px 8px 0 0; font-weight:600; font-size:13px;
+              color:var(--text-secondary); border-bottom:2px solid transparent; margin-bottom:-2px; transition:all 0.2s; white-space:nowrap; }
+      .tab.active { color:var(--accent-yellow); border-bottom-color:var(--accent-yellow); background:rgba(255,209,102,0.07); }
+      .tab-pane { display:none; }
+      .tab-pane.active { display:block; }
+
+      .forex-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:12px; margin-bottom:20px; }
+      .forex-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+      }
+      .forex-card:hover { border-color: var(--accent-yellow); transform:translateY(-2px); }
+      .forex-card.selected { border-color: var(--accent-yellow); background:rgba(255,209,102,0.08); }
+      .forex-flag  { font-size: 32px; margin-bottom: 8px; }
+      .forex-code  { font-size: 16px; font-weight: 800; }
+      .forex-price { font-size: 13px; color: var(--accent-yellow); font-weight: 700; margin-top:4px; }
+
+      .porto-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        background: var(--bg-hover);
+        border-radius: 10px;
+        margin-bottom: 10px;
+        border: 1px solid var(--border);
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .selected-display {
+        background: rgba(255,209,102,0.1);
+        border: 1px solid rgba(255,209,102,0.3);
+        border-radius: 8px;
+        padding: 10px 16px;
+        margin-bottom: 16px;
+        font-size: 14px;
+        color: var(--accent-yellow);
+        font-weight: 600;
+        display: none;
+      }
+      .quick-btn { padding:5px 14px; border-radius:20px; border:1px solid var(--border);
+                   background:var(--bg-hover); color:var(--text-secondary); cursor:pointer;
+                   font-size:12px; font-weight:600; transition:all 0.2s; }
+      .quick-btn:hover { border-color:var(--accent-yellow); color:var(--accent-yellow); }
+      .quick-amounts { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+    </style>
+  </head>
+  <body>
+    <div class="app-layout">
+      <script src="/js/api.js"></script>
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <span class="logo-icon">⚔️</span>
+          <div><div class="logo-text">AlgojoGacor</div></div>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section">Utama</div>
+          <a class="nav-item" href="/dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a>
+          <a class="nav-item" href="/pages/profile.html"><span class="nav-icon">👤</span> Profil & Status</a>
+          <a class="nav-item" href="/chat.html"><span class="nav-icon">💬</span> Live Chat</a>
+          <div class="nav-section">Kehidupan & Ekonomi</div>
+          <a class="nav-item" href="/pages/economy.html"><span class="nav-icon">💰</span> Ekonomi & Bank</a>
+          <a class="nav-item" href="/pages/bank.html"><span class="nav-icon">🏦</span> Bank & Rob</a>
+          <a class="nav-item" href="/pages/jobs.html"><span class="nav-icon">💼</span> Pekerjaan</a>
+          <a class="nav-item" href="/pages/life.html"><span class="nav-icon">❤️</span> Survival</a>
+          <div class="nav-section">Investasi</div>
+          <a class="nav-item" href="/pages/stocks.html"><span class="nav-icon">📈</span> Saham IDX</a>
+          <a class="nav-item active" href="/pages/valas.html"><span class="nav-icon">💱</span> Valas & Emas</a>
+          <a class="nav-item" href="/pages/crypto.html"><span class="nav-icon">₿</span> Crypto</a>
+          <div class="nav-section">Games</div>
+          <a class="nav-item" href="/pages/games.html"><span class="nav-icon">🎮</span> Casino & Games</a>
+          <a class="nav-item" href="/pages/minigames.html"><span class="nav-icon">🎲</span> Mini Games</a>
+          <a class="nav-item" href="/pages/battle.html"><span class="nav-icon">⚔️</span> PvP Battle</a>
+          <div class="nav-section">Bisnis</div>
+          <a class="nav-item" href="/pages/farming.html"><span class="nav-icon">🌾</span> Farming</a>
+          <a class="nav-item" href="/pages/ternak.html"><span class="nav-icon">🐄</span> Peternakan</a>
+          <a class="nav-item" href="/pages/pabrik.html"><span class="nav-icon">🏭</span> Pabrik</a>
+          <a class="nav-item" href="/pages/mining.html"><span class="nav-icon">⛏️</span> Mining</a>
+          <a class="nav-item" href="/pages/property.html"><span class="nav-icon">🏢</span> Properti</a>
+          <div class="nav-section">AI & Tools</div>
+          <a class="nav-item" href="/pages/ai.html"><span class="nav-icon">🤖</span> AI Chat</a>
+          <a class="nav-item" href="/pages/tools.html"><span class="nav-icon">🛠️</span> Tools</a>
+          <a class="nav-item" href="/pages/leaderboard.html"><span class="nav-icon">🏆</span> Leaderboard</a>
+          <div class="nav-section admin-only hidden">Admin</div>
+          <a class="nav-item admin-only hidden" href="/pages/admin.html"><span class="nav-icon">⚙️</span> Panel Admin</a>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="user-info">
+            <div class="user-avatar" id="sidebar-avatar">?</div>
+            <div>
+              <div class="user-name" id="sidebar-username">Loading...</div>
+              <div class="user-role" id="sidebar-role">—</div>
+            </div>
+          </div>
+          <button class="btn btn-secondary btn-block btn-sm" onclick="logout()">🚪 Logout</button>
+        </div>
+      </aside>
+
+      <div class="main-content">
+        <header class="topbar">
+          <div style="display:flex;align-items:center;gap:12px">
+            <button class="hamburger" onclick="toggleSidebar()">☰</button>
+            <span class="topbar-title">💱 Bursa Valas & Emas</span>
+          </div>
+          <div style="font-size:13px;color:var(--text-secondary)">
+            Saldo: <span id="top-balance" style="font-weight:700;color:var(--accent-green)">—</span>
+          </div>
+        </header>
+
+        <main class="content-area">
+          <div class="forex-hero">
+            <div>
+              <div class="forex-title">💱 Bursa Valas Real-Time</div>
+              <div class="forex-sub">Nilai tukar vs IDR dari Open Exchange Rates. Update tiap 15 menit.</div>
+            </div>
+            <div style="font-size:13px;color:var(--text-muted)">
+              Terakhir update: <span id="forex-last-update" style="color:var(--accent-yellow)">—</span>
+            </div>
+          </div>
+
+          <div class="tabs">
+            <div class="tab active" onclick="switchTab('kurs')">📉 Kurs</div>
+            <div class="tab" onclick="switchTab('beli')">🛒 Beli</div>
+            <div class="tab" onclick="switchTab('jual')">💰 Jual</div>
+            <div class="tab" onclick="switchTab('porto')">💼 Aset</div>
+          </div>
+
+          <!-- Kurs -->
+          <div id="pane-kurs" class="tab-pane active">
+            <div class="forex-grid" id="forex-grid">
+              <div style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:32px">⏳ Memuat kurs...</div>
+            </div>
+            <button class="btn btn-secondary" onclick="loadMarket()">🔄 Refresh Kurs</button>
+          </div>
+
+          <!-- Beli -->
+          <div id="pane-beli" class="tab-pane">
+            <div class="card">
+              <div class="card-header"><span class="icon">🛒</span><h3>Beli Valas / Emas</h3></div>
+              <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">Pilih dari kartu kurs lalu isi jumlah. Mendukung desimal (mis: 0.5 gram emas).</p>
+              <div id="selected-display-beli" class="selected-display"></div>
+              <div class="form-group">
+                <label>Kode Mata Uang</label>
+                <input type="text" class="form-input" id="beli-code" placeholder="Contoh: usd, emas, sgd" />
+              </div>
+              <div class="form-group">
+                <label>Jumlah (mendukung desimal)</label>
+                <input type="number" step="0.01" class="form-input" id="beli-qty" placeholder="Contoh: 100" />
+                <div class="quick-amounts">
+                  <button class="quick-btn" onclick="setVal('beli-qty','1')">1</button>
+                  <button class="quick-btn" onclick="setVal('beli-qty','10')">10</button>
+                  <button class="quick-btn" onclick="setVal('beli-qty','100')">100</button>
+                  <button class="quick-btn" onclick="setVal('beli-qty','1000')">1.000</button>
+                </div>
+              </div>
+              <button class="btn btn-success btn-block" onclick="valasAction('buy')">🛒 Beli Sekarang</button>
+            </div>
+          </div>
+
+          <!-- Jual -->
+          <div id="pane-jual" class="tab-pane">
+            <div class="card">
+              <div class="card-header"><span class="icon">💰</span><h3>Jual Valas / Emas</h3></div>
+              <div class="form-group">
+                <label>Kode Mata Uang</label>
+                <input type="text" class="form-input" id="jual-code" placeholder="Contoh: usd, emas" />
+              </div>
+              <div class="form-group">
+                <label>Jumlah (atau "all")</label>
+                <input type="text" class="form-input" id="jual-qty" placeholder="Contoh: 50 atau all" />
+              </div>
+              <button class="btn btn-danger btn-block" onclick="valasAction('sell')">💰 Jual Sekarang</button>
+            </div>
+          </div>
+
+          <!-- Porto -->
+          <div id="pane-porto" class="tab-pane">
+            <div id="porto-container">
+              <div style="color:var(--text-muted);text-align:center;padding:32px">⏳ Memuat aset...</div>
+            </div>
+          </div>
+
+          <div id="valas-result" style="margin-top:16px"></div>
+        </main>
+      </div>
+    </div>
+    <div id="toast-container"></div>
+
+    <script>
+      if (!requireLogin()) throw new Error();
+      const ME = getUser();
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        document.getElementById('sidebar-username').textContent = ME.username;
+        document.getElementById('sidebar-role').textContent     = ME.role;
+        document.getElementById('sidebar-avatar').textContent   = ME.username[0].toUpperCase();
+        await loadMarket();
+        await loadBalance();
+      });
+
+      async function loadBalance() {
+        const r = await api.get('/features/bank');
+        if (r?.success) document.getElementById('top-balance').textContent = fmtMoney(r.balance);
+      }
+
+      async function loadMarket() {
+        const r = await api.get('/features/valas/market');
+        if (!r?.success) return;
+        const lu = r.lastUpdate ? new Date(r.lastUpdate).toLocaleTimeString('id-ID') : '—';
+        document.getElementById('forex-last-update').textContent = lu;
+        const grid = document.getElementById('forex-grid');
+        grid.innerHTML = r.list.map(c => `
+          <div class="forex-card" onclick="selectCurrency('${c.code}')">
+            <div class="forex-flag">${c.flag}</div>
+            <div class="forex-code">${c.code.toUpperCase()}</div>
+            <div class="forex-price">Rp${fmt(c.price)}<span style="font-size:11px;color:var(--text-muted)"> / ${c.code === 'emas' ? 'gram' : c.code === 'jpy' ? 'yen' : 'lembar'}</span></div>
+          </div>`).join('');
+      }
+
+      async function loadPortfolio() {
+        const r = await api.get('/features/valas/portfolio');
+        if (!r?.success) return;
+        const container = document.getElementById('porto-container');
+        if (!r.portfolio.length) {
+          container.innerHTML = `<div style="text-align:center;padding:32px;color:var(--text-muted)">💼 Belum ada aset valas. Mulai investasi!</div>`;
+          return;
+        }
+        const items = r.portfolio.map(c => `
+          <div class="porto-item">
+            <div>
+              <div style="font-size:18px;font-weight:800">${c.flag} ${c.code.toUpperCase()}</div>
+              <div style="font-size:12px;color:var(--text-muted)">${c.qty} ${c.code === 'emas' ? 'gram' : 'lembar'} @ Rp${fmt(c.price)}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="color:var(--accent-yellow);font-weight:700">Rp${fmt(c.value)}</div>
+            </div>
+            <button class="btn btn-sm btn-danger" onclick="quickSell('${c.code}')">Jual</button>
+          </div>`).join('');
+        container.innerHTML = `
+          <div class="alert alert-info" style="margin-bottom:16px">
+            💼 Total Aset Valas: <strong>${fmtMoney(r.total)}</strong>
+          </div>
+          ${items}`;
+      }
+
+      function selectCurrency(code) {
+        document.getElementById('beli-code').value = code;
+        const el = document.getElementById('selected-display-beli');
+        el.style.display = 'block';
+        el.textContent   = `✅ Dipilih: ${code.toUpperCase()}`;
+        switchTab('beli');
+      }
+
+      function quickSell(code) {
+        document.getElementById('jual-code').value = code;
+        document.getElementById('jual-qty').value  = 'all';
+        switchTab('jual');
+      }
+
+      async function valasAction(action) {
+        let res;
+        if (action === 'buy') {
+          const code = document.getElementById('beli-code').value.trim().toLowerCase();
+          const qty  = document.getElementById('beli-qty').value;
+          if (!code || !qty) return toastError('Isi kode dan jumlah.');
+          res = await api.post('/features/valas/buy', { code, qty: parseFloat(qty) });
+        } else if (action === 'sell') {
+          const code = document.getElementById('jual-code').value.trim().toLowerCase();
+          const qty  = document.getElementById('jual-qty').value.trim();
+          if (!code || !qty) return toastError('Isi kode dan jumlah.');
+          res = await api.post('/features/valas/sell', { code, qty });
+        }
+        if (!res) return;
+        const resultEl = document.getElementById('valas-result');
+        if (res.success) {
+          toastSuccess(res.message);
+          resultEl.innerHTML = `<div class="alert alert-success">${res.message}</div>`;
+          await loadBalance();
+        } else {
+          toastError(res.message);
+          resultEl.innerHTML = `<div class="alert alert-error">${res.message}</div>`;
+        }
+      }
+
+      function setVal(id, v) { document.getElementById(id).value = v; }
+      function switchTab(name) {
+        const tabs = ['kurs','beli','jual','porto'];
+        document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i] === name));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        document.getElementById(`pane-${name}`).classList.add('active');
+        if (name === 'porto') loadPortfolio();
+      }
+    </script>
+  </body>
+</html>

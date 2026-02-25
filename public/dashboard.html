@@ -9,7 +9,6 @@
   </head>
   <body>
     <div class="app-layout">
-      <!-- ── Sidebar ── -->
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-logo">
           <span class="logo-icon">⚔️</span>
@@ -75,7 +74,6 @@
             <span class="nav-icon">🏆</span> Leaderboard
           </a>
 
-          <!-- Admin panel — tampil hanya jika admin/developer -->
           <div class="nav-section admin-only hidden">Admin</div>
           <a class="nav-item admin-only hidden" href="/pages/admin.html">
             <span class="nav-icon">⚙️</span> Panel Admin
@@ -96,26 +94,18 @@
         </div>
       </aside>
 
-      <!-- ── Main ── -->
       <div class="main-content">
         <header class="topbar">
-          <div
-            class="topbar-left"
-            style="display: flex; align-items: center; gap: 12px"
-          >
+          <div class="topbar-left" style="display: flex; align-items: center; gap: 12px">
             <button class="hamburger" onclick="toggleSidebar()">☰</button>
             <span class="topbar-title">Dashboard</span>
           </div>
           <div class="topbar-actions">
-            <span
-              id="topbar-greeting"
-              style="font-size: 13px; color: var(--text-secondary)"
-            ></span>
+            <span id="topbar-greeting" style="font-size: 13px; color: var(--text-secondary)"></span>
           </div>
         </header>
 
         <main class="content-area">
-          <!-- Status Bars -->
           <div class="status-grid" id="status-grid">
             <div class="stat-card">
               <div class="stat-value" id="stat-balance">...</div>
@@ -135,166 +125,75 @@
             </div>
           </div>
 
-          <!-- Vital Bars -->
           <div class="card" style="margin-bottom: 20px">
             <div class="card-header">
               <span class="icon">🩺</span>
               <h3>Status Vital</h3>
-              <span id="dead-badge" class="badge badge-banned hidden"
-                >💀 MATI</span
-              >
-              <span
-                id="sleep-badge"
-                class="badge"
-                style="background: var(--accent-blue); color: #000"
-                class="hidden"
-                >😴 TIDUR</span
-              >
+              <span id="dead-badge" class="badge badge-banned hidden">💀 MATI</span>
+              <span id="sleep-badge" class="badge hidden" style="background: var(--accent-blue); color: #000">😴 TIDUR</span>
             </div>
             <div>
-              <div
-                style="
-                  display: flex;
-                  justify-content: space-between;
-                  font-size: 13px;
-                  margin-bottom: 4px;
-                "
-              >
+              <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
                 <span>❤️ HP</span><span id="hp-val">100%</span>
               </div>
               <div class="progress-bar-container">
-                <div
-                  class="progress-bar hp"
-                  id="hp-bar"
-                  style="width: 100%"
-                ></div>
+                <div class="progress-bar hp" id="hp-bar" style="width: 100%"></div>
               </div>
-              <div
-                style="
-                  display: flex;
-                  justify-content: space-between;
-                  font-size: 13px;
-                  margin: 8px 0 4px;
-                "
-              >
+              <div style="display: flex; justify-content: space-between; font-size: 13px; margin: 8px 0 4px;">
                 <span>🍗 Lapar</span><span id="hunger-val">100%</span>
               </div>
               <div class="progress-bar-container">
-                <div
-                  class="progress-bar hunger"
-                  id="hunger-bar"
-                  style="width: 100%"
-                ></div>
+                <div class="progress-bar hunger" id="hunger-bar" style="width: 100%"></div>
               </div>
-              <div
-                style="
-                  display: flex;
-                  justify-content: space-between;
-                  font-size: 13px;
-                  margin: 8px 0 4px;
-                "
-              >
+              <div style="display: flex; justify-content: space-between; font-size: 13px; margin: 8px 0 4px;">
                 <span>⚡ Energi</span><span id="energy-val">100%</span>
               </div>
               <div class="progress-bar-container">
-                <div
-                  class="progress-bar energy"
-                  id="energy-bar"
-                  style="width: 100%"
-                ></div>
+                <div class="progress-bar energy" id="energy-bar" style="width: 100%"></div>
               </div>
             </div>
-            <div
-              style="display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap"
-            >
-              <button
-                class="btn btn-primary btn-sm"
-                onclick="quickAction('makan')"
-              >
-                🍗 Makan (Rp50jt)
-              </button>
-              <button
-                class="btn btn-secondary btn-sm"
-                onclick="quickAction('daily')"
-              >
-                🎁 Daily
-              </button>
-              <button
-                class="btn btn-secondary btn-sm"
-                onclick="quickAction('revive')"
-              >
-                🏥 RS/Revive
-              </button>
-              <button
-                class="btn btn-secondary btn-sm"
-                onclick="showSleepModal()"
-              >
-                😴 Tidur
-              </button>
-              <button
-                class="btn btn-secondary btn-sm"
-                onclick="quickAction('bangun')"
-              >
-                Bangun
-              </button>
+            <div style="display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap">
+              <button class="btn btn-primary btn-sm" onclick="quickAction('makan')">🍗 Makan (Rp50jt)</button>
+              <button class="btn btn-secondary btn-sm" onclick="quickAction('daily')">🎁 Daily</button>
+              <button class="btn btn-secondary btn-sm" onclick="quickAction('revive')">🏥 RS/Revive</button>
+              <button class="btn btn-secondary btn-sm" onclick="showSleepModal()">😴 Tidur</button>
+              <button class="btn btn-secondary btn-sm" onclick="quickAction('bangun')">Bangun</button>
             </div>
           </div>
 
-          <!-- Feature Grid -->
           <h3 style="margin-bottom: 14px">🎮 Fitur Tersedia</h3>
           <div class="feature-grid">
-            <div
-              class="feature-card"
-              onclick="location.href = '/pages/economy.html'"
-            >
+            <div class="feature-card" onclick="location.href = '/pages/economy.html'">
               <span class="feature-icon">💰</span>
               <div class="feature-name">Ekonomi & Bank</div>
               <div class="feature-desc">Daily, transfer, deposit, rob</div>
             </div>
-            <div
-              class="feature-card"
-              onclick="location.href = '/pages/games.html'"
-            >
+            <div class="feature-card" onclick="location.href = '/pages/games.html'">
               <span class="feature-icon">🎰</span>
               <div class="feature-name">Casino & Games</div>
               <div class="feature-desc">Casino, slot, roulette, duel</div>
             </div>
-            <div
-              class="feature-card"
-              onclick="location.href = '/pages/farming.html'"
-            >
+            <div class="feature-card" onclick="location.href = '/pages/farming.html'">
               <span class="feature-icon">🌾</span>
               <div class="feature-name">Farming</div>
               <div class="feature-desc">Tanam, panen, olah hasil</div>
             </div>
-            <div
-              class="feature-card"
-              onclick="location.href = '/pages/ternak.html'"
-            >
+            <div class="feature-card" onclick="location.href = '/pages/ternak.html'">
               <span class="feature-icon">🐄</span>
               <div class="feature-name">Peternakan</div>
               <div class="feature-desc">Beli, pakan, jual hewan</div>
             </div>
-            <div
-              class="feature-card"
-              onclick="location.href = '/pages/mining.html'"
-            >
+            <div class="feature-card" onclick="location.href = '/pages/mining.html'">
               <span class="feature-icon">⛏️</span>
               <div class="feature-name">Mining</div>
               <div class="feature-desc">GPU rig, BTC mining</div>
             </div>
-            <div
-              class="feature-card"
-              onclick="location.href = '/pages/property.html'"
-            >
+            <div class="feature-card" onclick="location.href = '/pages/property.html'">
               <span class="feature-icon">🏢</span>
               <div class="feature-name">Properti</div>
               <div class="feature-desc">Usaha pasif income</div>
             </div>
-            <div
-              class="feature-card"
-              onclick="location.href = '/pages/jobs.html'"
-            >
+            <div class="feature-card" onclick="location.href = '/pages/jobs.html'">
               <span class="feature-icon">💼</span>
               <div class="feature-name">Pekerjaan</div>
               <div class="feature-desc">Lamar kerja, ambil gaji</div>
@@ -304,42 +203,58 @@
               <div class="feature-name">Live Chat</div>
               <div class="feature-desc">10 room + DM privat</div>
             </div>
-            <div
-              class="feature-card"
-              onclick="location.href = '/pages/ai.html'"
-            >
+            <div class="feature-card" onclick="location.href = '/pages/ai.html'">
               <span class="feature-icon">🤖</span>
               <div class="feature-name">AI Chat</div>
               <div class="feature-desc">Obrolan AI cerdas</div>
             </div>
-            <div
-              class="feature-card"
-              onclick="location.href = '/pages/tools.html'"
-            >
+            <div class="feature-card" onclick="location.href = '/pages/tools.html'">
               <span class="feature-icon">🛠️</span>
               <div class="feature-name">Tools</div>
               <div class="feature-desc">Remove BG, TTS, cuaca</div>
             </div>
-            <div
-              class="feature-card"
-              onclick="location.href = '/pages/leaderboard.html'"
-            >
+            <div class="feature-card" onclick="location.href = '/pages/leaderboard.html'">
               <span class="feature-icon">🏆</span>
               <div class="feature-name">Leaderboard</div>
               <div class="feature-desc">Ranking terkaya</div>
             </div>
-            <div
-              class="feature-card"
-              onclick="location.href = '/pages/crypto.html'"
-            >
+            <div class="feature-card" onclick="location.href = '/pages/crypto.html'">
               <span class="feature-icon">🏆</span>
               <div class="feature-name">Crypto</div>
               <div class="feature-desc">Crypto</div>
             </div>
-            <div
-              class="feature-card admin-only hidden"
-              onclick="location.href = '/pages/admin.html'"
-            >
+
+            <div class="feature-card" onclick="location.href='/pages/stocks.html'">
+              <div class="feature-icon">📈</div>
+              <div class="feature-name">Saham IDX</div>
+              <div class="feature-desc">Beli & jual saham BEI real-time</div>
+            </div>
+            
+            <div class="feature-card" onclick="location.href='/pages/valas.html'">
+              <div class="feature-icon">💱</div>
+              <div class="feature-name">Valas & Emas</div>
+              <div class="feature-desc">Investasi mata uang & emas</div>
+            </div>
+            
+            <div class="feature-card" onclick="location.href='/pages/battle.html'">
+              <div class="feature-icon">⚔️</div>
+              <div class="feature-name">PvP Battle</div>
+              <div class="feature-desc">Duel & battle lawan pemain lain</div>
+            </div>
+            
+            <div class="feature-card" onclick="location.href='/pages/bank.html'">
+              <div class="feature-icon">🏦</div>
+              <div class="feature-name">Bank & Rob</div>
+              <div class="feature-desc">Kelola keuangan & rampok</div>
+            </div>
+            
+            <div class="feature-card" onclick="location.href='/pages/pabrik.html'">
+              <div class="feature-icon">🏭</div>
+              <div class="feature-name">Pabrik</div>
+              <div class="feature-desc">Craft produk dari hasil ternak</div>
+            </div>
+
+            <div class="feature-card admin-only hidden" onclick="location.href = '/pages/admin.html'">
               <span class="feature-icon">⚙️</span>
               <div class="feature-name">Panel Admin</div>
               <div class="feature-desc">Kelola user & sistem</div>
@@ -349,41 +264,20 @@
       </div>
     </div>
 
-    <!-- Sleep Modal -->
     <div class="modal-backdrop hidden" id="sleep-modal">
       <div class="modal">
         <div class="modal-header">
           <h3>😴 Atur Waktu Tidur</h3>
-          <button
-            class="modal-close"
-            onclick="
-              document.getElementById('sleep-modal').classList.add('hidden')
-            "
-          >
-            ✕
-          </button>
+          <button class="modal-close" onclick="document.getElementById('sleep-modal').classList.add('hidden')">✕</button>
         </div>
         <div class="form-group">
           <label>Durasi Tidur (1-10 jam)</label>
-          <input
-            type="number"
-            class="form-input"
-            id="sleep-hours"
-            min="1"
-            max="10"
-            value="8"
-          />
+          <input type="number" class="form-input" id="sleep-hours" min="1" max="10" value="8" />
         </div>
         <div class="alert alert-info">
-          Saat tidur, energi pulih +0.6%/menit & lapar hanya -0.02%/menit (hemat
-          5x).
+          Saat tidur, energi pulih +0.6%/menit & lapar hanya -0.02%/menit (hemat 5x).
         </div>
-        <button
-          class="btn btn-primary btn-block"
-          onclick="quickAction('tidur')"
-        >
-          😴 Tidur Sekarang
-        </button>
+        <button class="btn btn-primary btn-block" onclick="quickAction('tidur')">😴 Tidur Sekarang</button>
       </div>
     </div>
 

@@ -97,4 +97,51 @@ router.post("/crypto/margin", gameLimiter, crypto.marginCrypto);
 router.post("/crypto/paydebt", gameLimiter, crypto.paydeptCrypto);
 router.get("/crypto/portfolio", crypto.portofolioCrypto);
 
+// ── Bank ──────────────────────────────────────────────────────
+const bank = require('../controllers/features/bankController');
+router.get('/bank', bank.getStatus);
+router.post('/bank/deposit',  gameLimiter, bank.deposit);
+router.post('/bank/withdraw', gameLimiter, bank.withdraw);
+router.post('/bank/transfer', gameLimiter, bank.transfer);
+router.post('/bank/pinjam',   gameLimiter, bank.pinjam);
+router.post('/bank/bayar',    gameLimiter, bank.bayar);
+router.post('/bank/rob',      gameLimiter, bank.rob);
+
+// ── Stocks (Saham IDX) ───────────────────────────────────────
+const stocks = require('../controllers/features/stocksController');
+router.get('/stocks/market',     externalApiLimiter, stocks.getMarket);
+router.get('/stocks/portfolio',  stocks.getPortfolio);
+router.post('/stocks/buy',       gameLimiter, stocks.buyStock);
+router.post('/stocks/sell',      gameLimiter, stocks.sellStock);
+router.post('/stocks/dividen',   gameLimiter, stocks.claimDividen);
+
+// ── Valas (Forex + Emas) ─────────────────────────────────────
+const valas = require('../controllers/features/valasController');
+router.get('/valas/market',     externalApiLimiter, valas.getMarket);
+router.get('/valas/portfolio',  valas.getPortfolio);
+router.post('/valas/buy',       gameLimiter, valas.buyValas);
+router.post('/valas/sell',      gameLimiter, valas.sellValas);
+
+// ── Battle (PvP + Duel) ──────────────────────────────────────
+const battle = require('../controllers/features/battleController');
+// Duel taruhan
+router.get('/battle/duel/status',       battle.duelStatus);
+router.post('/battle/duel/challenge',   gameLimiter, battle.duelChallenge);
+router.post('/battle/duel/accept',      gameLimiter, battle.duelAccept);
+router.post('/battle/duel/reject',      gameLimiter, battle.duelReject);
+// PvP turn-based
+router.get('/battle/pvp/status',        battle.pvpStatus);
+router.post('/battle/pvp/challenge',    gameLimiter, battle.pvpChallenge);
+router.post('/battle/pvp/accept',       gameLimiter, battle.pvpAccept);
+router.post('/battle/pvp/action',       gameLimiter, battle.pvpAction);
+router.post('/battle/pvp/surrender',    gameLimiter, battle.pvpSurrender);
+
+// ── Pabrik (Factory) ─────────────────────────────────────────
+const pabrik = require('../controllers/features/pabrikController');
+router.get('/pabrik',               pabrik.getStatus);
+router.post('/pabrik/buy-machine',  pabrik.buyMachine);
+router.post('/pabrik/craft',        gameLimiter, pabrik.craft);
+router.post('/pabrik/sell',         gameLimiter, pabrik.sellProduct);
+router.post('/pabrik/add-inventory',pabrik.addToInventory);
+
 module.exports = router;

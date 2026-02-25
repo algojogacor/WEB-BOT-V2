@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AlgojoGacor — PvP Battle & Duel</title>
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <style>
+      .battle-hero {
+        background: linear-gradient(135deg, #1a0000, #200505, #1a0010);
+        border: 1px solid rgba(233,69,96,0.4);
+        border-radius: 16px;
+        padding: 24px 28px;
+        margin-bottom: 24px;
+        text-align: center;
+      }
+      .battle-hero-title { font-size: 28px; font-weight: 900; color: var(--accent); text-shadow: 0 0 20px rgba(233,69,96,0.5); }
+      .battle-hero-sub   { font-size: 13px; color: var(--text-secondary); margin-top:6px; }
+
+      .tabs { display:flex; gap:4px; margin-bottom:20px; border-bottom:2px solid var(--border); }
+      .tab  { padding:10px 20px; cursor:pointer; border-radius:8px 8px 0 0; font-weight:600; font-size:13px;
+              color:var(--text-secondary); border-bottom:2px solid transparent; margin-bottom:-2px; transition:all 0.2s; }
+      .tab.active { color:var(--accent); border-bottom-color:var(--accent); background:rgba(233,69,96,0.08); }
+      .tab-pane { display:none; }
+      .tab-pane.active { display:block; }
+
+      /* Battle Arena */
+      .arena-box {
+        background: linear-gradient(135deg, #110008, #0d0d1a);
+        border: 2px solid var(--accent);
+        border-radius: 20px;
+        padding: 28px;
+        text-align: center;
+        position: relative;
+        margin-bottom: 20px;
+      }
+      .vs-text { font-size: 32px; font-weight: 900; color: var(--accent); margin: 12px 0; }
+      .hp-bar-wrap { margin: 8px 0; }
+      .fighter-name { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+      .hp-bar { height: 18px; border-radius: 9px; background: linear-gradient(90deg, #e74c3c, #ff6b6b); transition: width 0.5s; }
+      .hp-bar-bg { background: var(--bg-secondary); border-radius: 9px; height: 18px; overflow: hidden; }
+      .hp-text { font-size: 12px; color: var(--text-muted); margin-top:4px; }
+      .battle-log {
+        background: var(--bg-secondary);
+        border-radius: 10px;
+        padding: 14px 16px;
+        font-size: 14px;
+        color: var(--accent-yellow);
+        margin: 16px 0;
+        min-height: 48px;
+        font-style: italic;
+      }
+      .action-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:16px; }
+      .btn-attack { background: linear-gradient(135deg, #e74c3c, #c0392b); color:#fff; border:none;
+                    padding:14px 32px; border-radius:12px; font-size:16px; font-weight:800; cursor:pointer; transition:all 0.2s; }
+      .btn-attack:hover { transform:scale(1.05); box-shadow:0 0 20px rgba(231,76,60,0.5); }
+      .btn-heal   { background: linear-gradient(135deg, #27ae60, #1e8449); color:#fff; border:none;
+                    padding:14px 32px; border-radius:12px; font-size:16px; font-weight:800; cursor:pointer; transition:all 0.2s; }
+      .btn-heal:hover { transform:scale(1.05); box-shadow:0 0 20px rgba(39,174,96,0.5); }
+      .turn-indicator {
+        display: inline-block;
+        background: var(--accent);
+        color: #fff;
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 12px;
+      }
+
+      /* Duel */
+      .duel-alert {
+        background: rgba(233,69,96,0.15);
+        border: 2px solid var(--accent);
+        border-radius: 16px;
+        padding: 24px;
+        text-align: center;
+        animation: pulse 1.5s infinite;
+      }
+      @keyframes pulse { 0%,100% { border-color: var(--accent); } 50% { border-color: rgba(233,69,96,0.3); } }
+    </style>
+  </head>
+  <body>
+    <div class="app-layout">
+      <script src="/js/api.js"></script>
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <span class="logo-icon">⚔️</span>
+          <div><div class="logo-text">AlgojoGacor</div></div>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section">Utama</div>
+          <a class="nav-item" href="/dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a>
+          <a class="nav-item" href="/pages/profile.html"><span class="nav-icon">👤</span> Profil & Status</a>
+          <a class="nav-item" href="/chat.html"><span class="nav-icon">💬</span> Live Chat</a>
+          <div class="nav-section">Kehidupan & Ekonomi</div>
+          <a class="nav-item" href="/pages/economy.html"><span class="nav-icon">💰</span> Ekonomi & Bank</a>
+          <a class="nav-item" href="/pages/bank.html"><span class="nav-icon">🏦</span> Bank & Rob</a>
+          <a class="nav-item" href="/pages/jobs.html"><span class="nav-icon">💼</span> Pekerjaan</a>
+          <a class="nav-item" href="/pages/life.html"><span class="nav-icon">❤️</span> Survival</a>
+          <div class="nav-section">Investasi</div>
+          <a class="nav-item" href="/pages/stocks.html"><span class="nav-icon">📈</span> Saham IDX</a>
+          <a class="nav-item" href="/pages/valas.html"><span class="nav-icon">💱</span> Valas & Emas</a>
+          <a class="nav-item" href="/pages/crypto.html"><span class="nav-icon">₿</span> Crypto</a>
+          <div class="nav-section">Games</div>
+          <a class="nav-item" href="/pages/games.html"><span class="nav-icon">🎮</span> Casino & Games</a>
+          <a class="nav-item" href="/pages/minigames.html"><span class="nav-icon">🎲</span> Mini Games</a>
+          <a class="nav-item active" href="/pages/battle.html"><span class="nav-icon">⚔️</span> PvP Battle</a>
+          <div class="nav-section">Bisnis</div>
+          <a class="nav-item" href="/pages/farming.html"><span class="nav-icon">🌾</span> Farming</a>
+          <a class="nav-item" href="/pages/ternak.html"><span class="nav-icon">🐄</span> Peternakan</a>
+          <a class="nav-item" href="/pages/pabrik.html"><span class="nav-icon">🏭</span> Pabrik</a>
+          <a class="nav-item" href="/pages/mining.html"><span class="nav-icon">⛏️</span> Mining</a>
+          <a class="nav-item" href="/pages/property.html"><span class="nav-icon">🏢</span> Properti</a>
+          <div class="nav-section">AI & Tools</div>
+          <a class="nav-item" href="/pages/ai.html"><span class="nav-icon">🤖</span> AI Chat</a>
+          <a class="nav-item" href="/pages/tools.html"><span class="nav-icon">🛠️</span> Tools</a>
+          <a class="nav-item" href="/pages/leaderboard.html"><span class="nav-icon">🏆</span> Leaderboard</a>
+          <div class="nav-section admin-only hidden">Admin</div>
+          <a class="nav-item admin-only hidden" href="/pages/admin.html"><span class="nav-icon">⚙️</span> Panel Admin</a>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="user-info">
+            <div class="user-avatar" id="sidebar-avatar">?</div>
+            <div>
+              <div class="user-name" id="sidebar-username">Loading...</div>
+              <div class="user-role" id="sidebar-role">—</div>
+            </div>
+          </div>
+          <button class="btn btn-secondary btn-block btn-sm" onclick="logout()">🚪 Logout</button>
+        </div>
+      </aside>
+
+      <div class="main-content">
+        <header class="topbar">
+          <div style="display:flex;align-items:center;gap:12px">
+            <button class="hamburger" onclick="toggleSidebar()">☰</button>
+            <span class="topbar-title">⚔️ PvP Battle & Duel</span>
+          </div>
+          <div style="font-size:13px;color:var(--text-secondary)">
+            Saldo: <span id="top-balance" style="font-weight:700;color:var(--accent-green)">—</span>
+          </div>
+        </header>
+
+        <main class="content-area">
+          <div class="battle-hero">
+            <div class="battle-hero-title">⚔️ ARENA PERTARUNGAN</div>
+            <div class="battle-hero-sub">Tantang pemain lain dalam duel sengit. Buktikan siapa yang terkuat!</div>
+          </div>
+
+          <div class="tabs">
+            <div class="tab active" onclick="switchTab('pvp')">⚔️ PvP Battle</div>
+            <div class="tab" onclick="switchTab('duel')">🔫 Duel Taruhan</div>
+          </div>
+
+          <!-- PVP -->
+          <div id="pane-pvp" class="tab-pane active">
+
+            <!-- Incoming / aktif battle check -->
+            <div id="pvp-incoming" style="display:none;margin-bottom:16px"></div>
+
+            <!-- Battle Arena (hidden until active) -->
+            <div id="pvp-arena" style="display:none">
+              <div class="arena-box">
+                <div class="turn-indicator" id="pvp-turn-label">Giliran kamu</div>
+                <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center">
+                  <div>
+                    <div class="fighter-name" id="p1-name">—</div>
+                    <div class="hp-bar-bg"><div class="hp-bar" id="p1-hp-bar" style="width:100%"></div></div>
+                    <div class="hp-text" id="p1-hp-text">— / —</div>
+                  </div>
+                  <div class="vs-text">VS</div>
+                  <div>
+                    <div class="fighter-name" id="p2-name">—</div>
+                    <div class="hp-bar-bg"><div class="hp-bar" id="p2-hp-bar" style="width:100%"></div></div>
+                    <div class="hp-text" id="p2-hp-text">— / —</div>
+                  </div>
+                </div>
+                <div class="battle-log" id="battle-log">Pertarungan dimulai!</div>
+                <div class="action-btns" id="action-btns">
+                  <button class="btn-attack" onclick="pvpAction('attack')">💥 SERANG</button>
+                  <button class="btn-heal"   onclick="pvpAction('heal')">🧪 OBAT</button>
+                </div>
+                <div style="margin-top:12px">
+                  <button class="btn btn-secondary btn-sm" onclick="pvpSurrender()">🏳️ Menyerah</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Challenge Form -->
+            <div id="pvp-challenge-form">
+              <div class="card">
+                <div class="card-header"><span class="icon">⚔️</span><h3>Tantang PvP</h3></div>
+                <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">
+                  Turn-based battle. Giliran bergantian: Serang (damage random + chance crit/miss) atau Heal (+10~30 HP).<br>
+                  Pemenang mendapat <strong style="color:var(--accent-yellow)">Rp500.000 + 150 XP</strong>.
+                </p>
+                <div class="form-group">
+                  <label>Username Lawan</label>
+                  <input type="text" class="form-input" id="pvp-target" placeholder="username lawan" />
+                </div>
+                <button class="btn btn-danger btn-block" onclick="pvpChallenge()">⚔️ Kirim Tantangan</button>
+              </div>
+              <div id="pvp-result" style="margin-top:12px"></div>
+            </div>
+          </div>
+
+          <!-- DUEL -->
+          <div id="pane-duel" class="tab-pane">
+
+            <!-- Incoming Duel Notification -->
+            <div id="duel-incoming" style="display:none;margin-bottom:16px"></div>
+
+            <div class="card">
+              <div class="card-header"><span class="icon">🔫</span><h3>Tantang Duel Taruhan</h3></div>
+              <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">
+                Instant 50/50. Pemenang dapat uang taruhan lawan dikurangi pajak 10%.<br>
+                Target harus online dan punya saldo cukup.
+              </p>
+              <div class="form-group">
+                <label>Username Target</label>
+                <input type="text" class="form-input" id="duel-target" placeholder="username target" />
+              </div>
+              <div class="form-group">
+                <label>Taruhan (min Rp1.000)</label>
+                <input type="number" class="form-input" id="duel-amount" placeholder="Contoh: 10000000" />
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+                  <button class="quick-btn" onclick="setVal('duel-amount','1000000')">1 Jt</button>
+                  <button class="quick-btn" onclick="setVal('duel-amount','10000000')">10 Jt</button>
+                  <button class="quick-btn" onclick="setVal('duel-amount','100000000')">100 Jt</button>
+                  <button class="quick-btn" onclick="setVal('duel-amount','1000000000')">1 M</button>
+                </div>
+              </div>
+              <button class="btn btn-danger btn-block" onclick="duelChallenge()">🔫 Kirim Tantangan Duel</button>
+            </div>
+
+            <div id="duel-result" style="margin-top:12px"></div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <div id="toast-container"></div>
+
+    <script>
+      if (!requireLogin()) throw new Error();
+      const ME = getUser();
+      let currentBattle = null;
+      let currentBattleId = null;
+      let pollInterval = null;
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        document.getElementById('sidebar-username').textContent = ME.username;
+        document.getElementById('sidebar-role').textContent     = ME.role;
+        document.getElementById('sidebar-avatar').textContent   = ME.username[0].toUpperCase();
+        await loadBalance();
+        await checkBattleStatus();
+        await checkDuelStatus();
+        pollInterval = setInterval(checkBattleStatus, 3000);
+      });
+
+      async function loadBalance() {
+        const r = await api.get('/features/bank');
+        if (r?.success) document.getElementById('top-balance').textContent = fmtMoney(r.balance);
+      }
+
+      // ── PVP ──────────────────────────────────────────────────
+      async function checkBattleStatus() {
+        const r = await api.get('/features/battle/pvp/status');
+        if (!r?.success) return;
+        if (r.battle) {
+          currentBattle   = r.battle;
+          currentBattleId = r.battleId;
+          if (r.battle.status === 'waiting' && r.battle.p2 === ME.username) {
+            showPvpIncoming(r.battleId, r.battle);
+          } else if (r.battle.status === 'playing') {
+            renderArena(r.battle);
+          }
+        } else {
+          document.getElementById('pvp-arena').style.display = 'none';
+          document.getElementById('pvp-incoming').style.display = 'none';
+          document.getElementById('pvp-challenge-form').style.display = 'block';
+        }
+      }
+
+      function showPvpIncoming(battleId, b) {
+        const el = document.getElementById('pvp-incoming');
+        el.style.display = 'block';
+        el.innerHTML = `
+          <div class="duel-alert">
+            <div style="font-size:20px;font-weight:800;color:var(--accent)">⚔️ TANTANGAN PVP!</div>
+            <div style="margin:8px 0;font-size:14px">${b.p1} menantangmu bertarung!</div>
+            <div style="display:flex;gap:12px;justify-content:center;margin-top:16px">
+              <button class="btn btn-success" onclick="pvpAccept('${battleId}')">✅ Terima</button>
+              <button class="btn btn-secondary" onclick="pvpSurrender()">❌ Tolak</button>
+            </div>
+          </div>`;
+        document.getElementById('pvp-challenge-form').style.display = 'none';
+      }
+
+      function renderArena(b) {
+        document.getElementById('pvp-arena').style.display = 'block';
+        document.getElementById('pvp-challenge-form').style.display = 'none';
+        document.getElementById('pvp-incoming').style.display = 'none';
+
+        document.getElementById('p1-name').textContent  = b.p1;
+        document.getElementById('p2-name').textContent  = b.p2;
+        const p1pct = Math.max(0, (b.p1_hp / b.p1_maxhp) * 100).toFixed(0);
+        const p2pct = Math.max(0, (b.p2_hp / b.p2_maxhp) * 100).toFixed(0);
+        document.getElementById('p1-hp-bar').style.width  = p1pct + '%';
+        document.getElementById('p2-hp-bar').style.width  = p2pct + '%';
+        document.getElementById('p1-hp-text').textContent = `${Math.max(0,b.p1_hp)} / ${b.p1_maxhp}`;
+        document.getElementById('p2-hp-text').textContent = `${Math.max(0,b.p2_hp)} / ${b.p2_maxhp}`;
+        document.getElementById('battle-log').textContent = b.log;
+
+        const isMyTurn = b.turn === ME.username;
+        document.getElementById('pvp-turn-label').textContent = isMyTurn ? '⚔️ Giliran KAMU!' : `⏳ Giliran ${b.turn}...`;
+        document.getElementById('action-btns').style.opacity  = isMyTurn ? '1' : '0.4';
+        document.getElementById('action-btns').style.pointerEvents = isMyTurn ? 'auto' : 'none';
+      }
+
+      async function pvpChallenge() {
+        const target = document.getElementById('pvp-target').value.trim();
+        if (!target) return toastError('Isi username lawan.');
+        const res = await api.post('/features/battle/pvp/challenge', { target });
+        const el  = document.getElementById('pvp-result');
+        if (res?.success) { toastSuccess(res.message); el.innerHTML = `<div class="alert alert-success">${res.message}</div>`; }
+        else { toastError(res?.message); el.innerHTML = `<div class="alert alert-error">${res?.message}</div>`; }
+      }
+
+      async function pvpAccept(battleId) {
+        const res = await api.post('/features/battle/pvp/accept', { battleId });
+        if (res?.success) { currentBattle = res.battle; currentBattleId = battleId; renderArena(res.battle); }
+        else toastError(res?.message);
+      }
+
+      async function pvpAction(action) {
+        if (!currentBattleId) return;
+        const res = await api.post('/features/battle/pvp/action', { battleId: currentBattleId, action });
+        if (!res) return;
+        if (res.finished) {
+          document.getElementById('pvp-arena').style.display = 'none';
+          document.getElementById('pvp-challenge-form').style.display = 'block';
+          const icon = res.winner === ME.username ? '🏆' : '💀';
+          document.getElementById('pvp-result').innerHTML = `<div class="alert ${res.winner === ME.username ? 'alert-success' : 'alert-error'}">${icon} ${res.message}</div>`;
+          toastSuccess(res.message);
+          await loadBalance();
+          currentBattle = null; currentBattleId = null;
+        } else if (res.battle) {
+          renderArena(res.battle);
+        }
+      }
+
+      async function pvpSurrender() {
+        const res = await api.post('/features/battle/pvp/surrender', {});
+        if (res?.success) {
+          document.getElementById('pvp-arena').style.display = 'none';
+          document.getElementById('pvp-incoming').style.display = 'none';
+          document.getElementById('pvp-challenge-form').style.display = 'block';
+          toastInfo(res.message);
+          currentBattle = null; currentBattleId = null;
+        }
+      }
+
+      // ── DUEL ─────────────────────────────────────────────────
+      async function checkDuelStatus() {
+        const r = await api.get('/features/battle/duel/status');
+        if (!r?.success) return;
+        const el = document.getElementById('duel-incoming');
+        if (r.incoming) {
+          el.style.display = 'block';
+          el.innerHTML = `
+            <div class="duel-alert">
+              <div style="font-size:22px;font-weight:800;color:var(--accent)">🔫 DITANTANG DUEL!</div>
+              <div style="margin:10px 0">
+                <strong>${r.incoming.challenger}</strong> menantangmu duel taruhan<br>
+                💰 Taruhan: <strong>${fmtMoney(r.incoming.amount)}</strong>
+              </div>
+              <div style="display:flex;gap:12px;justify-content:center;margin-top:16px">
+                <button class="btn btn-danger" onclick="duelAccept()">🔫 Terima Duel</button>
+                <button class="btn btn-secondary" onclick="duelReject()">🏳️ Tolak</button>
+              </div>
+            </div>`;
+        } else {
+          el.style.display = 'none';
+        }
+      }
+
+      async function duelChallenge() {
+        const target = document.getElementById('duel-target').value.trim();
+        const amount = document.getElementById('duel-amount').value;
+        if (!target || !amount) return toastError('Isi username dan taruhan.');
+        const res = await api.post('/features/battle/duel/challenge', { target, amount: parseInt(amount) });
+        const el  = document.getElementById('duel-result');
+        if (res?.success) { toastSuccess(res.message); el.innerHTML = `<div class="alert alert-success">${res.message}</div>`; }
+        else { toastError(res?.message); el.innerHTML = `<div class="alert alert-error">${res?.message}</div>`; }
+      }
+
+      async function duelAccept() {
+        const res = await api.post('/features/battle/duel/accept', {});
+        const el  = document.getElementById('duel-result');
+        if (res?.success) {
+          const isWin = res.winner === ME.username;
+          toastSuccess(res.message);
+          el.innerHTML = `<div class="alert ${isWin ? 'alert-success' : 'alert-error'}">${isWin ? '🏆' : '💀'} ${res.message}</div>`;
+          document.getElementById('duel-incoming').style.display = 'none';
+          await loadBalance();
+        } else {
+          toastError(res?.message);
+          el.innerHTML = `<div class="alert alert-error">${res?.message}</div>`;
+        }
+      }
+
+      async function duelReject() {
+        const res = await api.post('/features/battle/duel/reject', {});
+        if (res?.success) { toastInfo(res.message); document.getElementById('duel-incoming').style.display = 'none'; }
+      }
+
+      function setVal(id, v) { document.getElementById(id).value = v; }
+      function switchTab(name) {
+        const tabs = ['pvp','duel'];
+        document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i] === name));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        document.getElementById(`pane-${name}`).classList.add('active');
+        if (name === 'duel') checkDuelStatus();
+      }
+    </script>
+  </body>
+</html>
