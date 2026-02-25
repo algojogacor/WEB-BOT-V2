@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AlgojoGacor — URL Shortener</title>
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/dashboard.css" />
+  <style>
+    .shortlink-hero {
+      background: linear-gradient(135deg, #0a1628, #1a2a1a, #0d1b2a);
+      border: 1px solid rgba(0,212,170,0.3);
+      border-radius: 16px; padding: 32px; text-align: center; margin-bottom: 20px;
+    }
+    .link-item {
+      background: var(--bg-hover); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap; transition: border-color 0.2s;
+    }
+    .link-item:hover { border-color: rgba(0,212,170,0.4); }
+    .link-short { color: var(--accent-green); font-weight: 700; font-size: 15px; flex: 1; min-width: 120px; }
+    .link-orig { color: var(--text-secondary); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 260px; }
+    .provider-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: rgba(0,212,170,0.15); color: var(--accent-green); flex-shrink: 0; }
+    .copy-btn { padding: 6px 14px; border-radius: 8px; border: 1px solid rgba(0,212,170,0.4);
+      background: transparent; color: var(--accent-green); cursor: pointer; font-size: 12px; font-weight: 600;
+      transition: all 0.2s; white-space: nowrap; flex-shrink: 0; }
+    .copy-btn:hover { background: rgba(0,212,170,0.15); }
+    .del-btn { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(231,76,60,0.3);
+      background: transparent; color: #e74c3c; cursor: pointer; font-size: 12px; transition: all 0.2s; flex-shrink: 0; }
+    .del-btn:hover { background: rgba(231,76,60,0.1); }
+    .empty-state { text-align: center; padding: 36px; color: var(--text-secondary); }
+    .unshort-result { background: rgba(0,212,170,0.08); border: 1px solid rgba(0,212,170,0.3);
+      border-radius: 10px; padding: 14px; margin-top: 12px; word-break: break-all; display: none; }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <script src="/js/api.js"></script>
+  <script src="/js/shortlinkHandler.js"></script>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><span class="logo-icon">⚔️</span><div><div class="logo-text">AlgojoGacor</div><div class="logo-sub">Web Platform</div></div></div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" href="/dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a>
+      <div class="nav-section">AI & Tools</div>
+      <a class="nav-item" href="/pages/ai.html"><span class="nav-icon">🤖</span> AI Chat</a>
+      <a class="nav-item" href="/pages/tools.html"><span class="nav-icon">🛠️</span> Utilitas</a>
+      <a class="nav-item" href="/pages/reminder.html"><span class="nav-icon">⏰</span> Reminder</a>
+      <a class="nav-item" href="/pages/zodiak.html"><span class="nav-icon">♈</span> Zodiak</a>
+      <a class="nav-item active" href="/pages/shortlink.html"><span class="nav-icon">🔗</span> Shortlink</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="sidebar-avatar">?</div>
+        <div><div class="user-name" id="sidebar-username">Loading...</div></div>
+      </div>
+      <button class="btn btn-secondary btn-block btn-sm" onclick="logout()">🚪 Logout</button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+        <span class="topbar-title">🔗 URL Shortener</span>
+      </div>
+    </header>
+    <main class="content-area">
+      <div class="shortlink-hero">
+        <div style="font-size:48px;margin-bottom:8px">🔗</div>
+        <h2 style="color:var(--accent-green)">URL Shortener</h2>
+        <p style="color:var(--text-secondary);font-size:14px">Persingkat link panjang — gratis, tanpa API key · 3 provider</p>
+      </div>
+
+      <!-- Shorten -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><span class="icon">✂️</span><h3>Buat Short Link</h3></div>
+        <label class="form-label">URL Asli</label>
+        <input type="url" id="url-input" class="form-control" placeholder="https://example.com/link-sangat-panjang..." style="margin-bottom:10px" />
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
+          <label class="form-label" style="margin:0;flex-shrink:0">Provider:</label>
+          <select id="provider-select" class="form-control" style="max-width:180px">
+            <option value="auto">🤖 Auto (coba semua)</option>
+            <option value="tinyurl">TinyURL</option>
+            <option value="isgd">is.gd</option>
+            <option value="vgd">v.gd</option>
+          </select>
+        </div>
+        <button class="btn btn-success btn-block" id="btn-shorten" onclick="shortenUrl()">✂️ Persingkat URL</button>
+      </div>
+
+      <!-- Unshorten -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><span class="icon">🔍</span><h3>Ungkap URL Asli dari Short Link</h3></div>
+        <div style="display:flex;gap:8px">
+          <input type="url" id="unshort-input" class="form-control" placeholder="https://tinyurl.com/xxxxx atau is.gd/xxxxx" />
+          <button class="btn btn-secondary" id="btn-unshort" style="white-space:nowrap" onclick="unshortUrl()">🔍 Ungkap</button>
+        </div>
+        <div class="unshort-result" id="unshort-result"></div>
+      </div>
+
+      <!-- History -->
+      <div class="card">
+        <div class="card-header">
+          <span class="icon">📋</span>
+          <h3>Riwayat Link (<span id="link-count">0</span>)</h3>
+          <button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="clearHistory()">🗑️ Hapus Semua</button>
+        </div>
+        <div id="link-list">
+          <div class="empty-state">📭 Belum ada link yang dibuat</div>
+        </div>
+      </div>
+
+      <div id="toast-container"></div>
+    </main>
+  </div>
+</div>
+<script>initShortlink();</script>
+</body>
+</html>
