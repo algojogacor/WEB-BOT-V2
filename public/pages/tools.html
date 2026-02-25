@@ -1,21 +1,244 @@
-<!DOCTYPE html>
-<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AlgojoGacor</title>
-<link rel="stylesheet" href="/css/main.css"><link rel="stylesheet" href="/css/dashboard.css"></head>
-<body><div class="app-layout">
-<aside class="sidebar" id="sidebar"><div class="sidebar-logo"><span class="logo-icon">⚔️</span><div><div class="logo-text">AlgojoGacor</div></div></div>
-<nav class="sidebar-nav"><a class="nav-item" href="/dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a></nav>
-<div class="sidebar-footer"><div class="user-info"><div class="user-avatar" id="sidebar-avatar">?</div><div><div class="user-name" id="sidebar-username">Loading...</div></div></div>
-<button class="btn btn-secondary btn-block btn-sm" onclick="logout()">🚪 Logout</button></div></aside>
-<div class="main-content"><header class="topbar"><div style="display:flex;align-items:center;gap:12px"><button class="hamburger" onclick="toggleSidebar()">☰</button>
-<span class="topbar-title" id="page-title">Fitur</span></div></header>
-<main class="content-area"><div class="card" style="text-align:center;padding:40px">
-<div style="font-size:60px;margin-bottom:16px">🚧</div>
-<h2>Halaman ini siap dikembangkan</h2>
-<p style="color:var(--text-secondary);margin:12px 0">Tambahkan logika di <code>controllers/features/</code> dan isi halaman HTML ini sesuai kebutuhan.</p>
-<a href="/dashboard.html" class="btn btn-primary">← Kembali ke Dashboard</a>
-</div></main></div></div>
-<div id="toast-container"></div><script src="/js/api.js"></script>
-<script>
-const ME=getUser(); if(ME){document.getElementById('sidebar-username').textContent=ME.username;document.getElementById('sidebar-avatar').textContent=ME.username[0].toUpperCase();}
-document.getElementById('page-title').textContent=document.title.split('—')[1]?.trim()||'Fitur';
-</script></body></html>
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AlgojoGacor — Tools & Utilitas</title>
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/dashboard.css" />
+  <style>
+    .tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:2px solid var(--border);overflow-x:auto;}
+    .tab{padding:10px 18px;cursor:pointer;border-radius:8px 8px 0 0;font-weight:600;font-size:13px;
+      color:var(--text-secondary);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all 0.2s;}
+    .tab.active{color:var(--accent-blue);border-bottom-color:var(--accent-blue);background:rgba(76,201,240,0.08);}
+    .result-box{background:rgba(76,201,240,0.08);border:1px solid rgba(76,201,240,0.3);border-radius:10px;padding:14px;margin-top:12px;word-break:break-all;display:none;}
+    .qr-img{max-width:200px;border-radius:10px;border:4px solid var(--bg-hover);display:block;margin:0 auto;}
+    .weather-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:12px;}
+    .weather-card{background:var(--bg-hover);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
+    .w-icon{font-size:28px;margin-bottom:4px;} .w-val{font-weight:700;font-size:16px;} .w-lab{font-size:11px;color:var(--text-secondary);}
+    .password-output{font-family:monospace;font-size:16px;letter-spacing:2px;padding:12px;background:var(--bg-secondary);
+      border-radius:8px;border:1px solid var(--border);user-select:all;word-break:break-all;margin-top:10px;display:none;}
+    .pass-type-grid{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;}
+    .pass-chip{padding:6px 14px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;
+      border:1px solid var(--border);background:var(--bg-hover);color:var(--text-secondary);transition:all 0.2s;}
+    .pass-chip.active,.pass-chip:hover{border-color:var(--accent-blue);color:var(--accent-blue);background:rgba(76,201,240,0.1);}
+    .news-item{border-bottom:1px solid var(--border);padding:12px 0;}
+    .news-item:last-child{border:none;}
+    .news-title{font-weight:600;font-size:14px;margin-bottom:4px;cursor:pointer;}
+    .news-title:hover{color:var(--accent-blue);}
+    .news-meta{font-size:11px;color:var(--text-secondary);}
+    .audio-player{width:100%;margin-top:10px;border-radius:8px;display:none;}
+    .kota-chip{padding:6px 14px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;
+      border:1px solid var(--border);background:var(--bg-hover);color:var(--text-secondary);transition:all 0.2s;}
+    .kota-chip:hover{border-color:var(--accent-blue);color:var(--accent-blue);}
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <script src="/js/api.js"></script>
+  <script src="/js/toolsHandler.js"></script>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><span class="logo-icon">⚔️</span><div><div class="logo-text">AlgojoGacor</div><div class="logo-sub">Web Platform</div></div></div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" href="/dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a>
+      <div class="nav-section">AI & Tools</div>
+      <a class="nav-item" href="/pages/ai.html"><span class="nav-icon">🤖</span> AI Chat</a>
+      <a class="nav-item active" href="/pages/tools.html"><span class="nav-icon">🛠️</span> Utilitas</a>
+      <a class="nav-item" href="/pages/reminder.html"><span class="nav-icon">⏰</span> Reminder</a>
+      <a class="nav-item" href="/pages/zodiak.html"><span class="nav-icon">♈</span> Zodiak</a>
+      <a class="nav-item" href="/pages/shortlink.html"><span class="nav-icon">🔗</span> Shortlink</a>
+      <a class="nav-item" href="/pages/leaderboard.html"><span class="nav-icon">🏆</span> Leaderboard</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="sidebar-avatar">?</div>
+        <div><div class="user-name" id="sidebar-username">Loading...</div></div>
+      </div>
+      <button class="btn btn-secondary btn-block btn-sm" onclick="logout()">🚪 Logout</button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+        <span class="topbar-title">🛠️ Tools & Utilitas</span>
+      </div>
+    </header>
+    <main class="content-area">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('qr',this)">📲 QR Code</div>
+        <div class="tab" onclick="switchTab('password',this)">🔑 Password</div>
+        <div class="tab" onclick="switchTab('encode',this)">🔠 Encode/Hash</div>
+        <div class="tab" onclick="switchTab('cuaca',this)">🌤️ Cuaca</div>
+        <div class="tab" onclick="switchTab('berita',this)">📰 Berita</div>
+        <div class="tab" onclick="switchTab('tts',this)">🔊 TTS</div>
+        <div class="tab" onclick="switchTab('removebg',this)">✂️ Remove BG</div>
+      </div>
+
+      <!-- ── QR CODE ── -->
+      <div id="tab-qr">
+        <div class="card">
+          <div class="card-header"><span class="icon">📲</span><h3>QR Code Generator</h3></div>
+          <label class="form-label">Teks / URL / Nomor WA</label>
+          <textarea id="qr-text" class="form-control" rows="3" placeholder="Masukkan teks, link, atau nomor WA..."></textarea>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <select id="qr-size" class="form-control" style="max-width:130px">
+              <option value="256">256×256</option>
+              <option value="512" selected>512×512</option>
+              <option value="800">800×800</option>
+            </select>
+            <select id="qr-color" class="form-control" style="max-width:130px">
+              <option value="000000">⚫ Hitam</option>
+              <option value="1a1aff">🔵 Biru</option>
+              <option value="e94560">🔴 Merah</option>
+              <option value="00d4aa">🟢 Hijau</option>
+            </select>
+            <button class="btn btn-primary" onclick="generateQR()">📲 Buat QR</button>
+          </div>
+          <div id="qr-result" class="result-box">
+            <img id="qr-img" class="qr-img" alt="QR Code" />
+            <div style="text-align:center;margin-top:10px;display:flex;gap:8px;justify-content:center">
+              <a id="qr-download" class="btn btn-secondary btn-sm" download="qrcode.png">⬇️ Download</a>
+              <button class="btn btn-secondary btn-sm" onclick="copyQrUrl()">📋 Copy URL</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PASSWORD ── -->
+      <div id="tab-password" style="display:none">
+        <div class="card">
+          <div class="card-header"><span class="icon">🔑</span><h3>Password Generator</h3></div>
+          <label class="form-label">Panjang: <strong id="len-display">16</strong> karakter</label>
+          <input type="range" id="pass-len" min="4" max="64" value="16" oninput="updateLenDisplay()" style="width:100%;margin-bottom:14px" />
+          <label class="form-label">Tipe Password</label>
+          <div class="pass-type-grid">
+            <span class="pass-chip active" onclick="selectPassType('strong',this)">💪 Kuat</span>
+            <span class="pass-chip" onclick="selectPassType('simple',this)">🔤 Sederhana</span>
+            <span class="pass-chip" onclick="selectPassType('pin',this)">🔢 PIN</span>
+            <span class="pass-chip" onclick="selectPassType('memorable',this)">🧠 Mudah Ingat</span>
+          </div>
+          <button class="btn btn-primary btn-block" onclick="generatePassword()">🎲 Generate Password</button>
+          <div id="pass-output" class="password-output"></div>
+          <div id="pass-actions" style="display:none;margin-top:8px;display:flex;gap:8px">
+            <button class="btn btn-secondary btn-sm" onclick="copyPassword()">📋 Copy</button>
+            <button class="btn btn-secondary btn-sm" onclick="generatePassword()">🔄 Lagi</button>
+          </div>
+          <div id="pass-entropy" style="font-size:12px;color:var(--text-secondary);margin-top:8px"></div>
+        </div>
+      </div>
+
+      <!-- ── ENCODE ── -->
+      <div id="tab-encode" style="display:none">
+        <div class="card">
+          <div class="card-header"><span class="icon">🔠</span><h3>Encode / Decode</h3></div>
+          <label class="form-label">Input Teks</label>
+          <textarea id="enc-input" class="form-control" rows="3" placeholder="Masukkan teks..."></textarea>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+            <button class="btn btn-primary btn-sm" onclick="doEncode('base64-enc')">📤 Base64 Encode</button>
+            <button class="btn btn-secondary btn-sm" onclick="doEncode('base64-dec')">📥 Base64 Decode</button>
+            <button class="btn btn-secondary btn-sm" onclick="doEncode('url-enc')">🔗 URL Encode</button>
+            <button class="btn btn-secondary btn-sm" onclick="doEncode('url-dec')">🔓 URL Decode</button>
+            <button class="btn btn-secondary btn-sm" onclick="doEncode('html-enc')">🏷️ HTML Encode</button>
+            <button class="btn btn-secondary btn-sm" onclick="doEncode('uuid')">🆔 UUID</button>
+          </div>
+          <div id="enc-result" class="result-box">
+            <strong>Hasil:</strong><br>
+            <div id="enc-output" style="margin-top:6px;font-family:monospace;word-break:break-all"></div>
+            <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyEncResult()">📋 Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CUACA ── -->
+      <div id="tab-cuaca" style="display:none">
+        <div class="card">
+          <div class="card-header"><span class="icon">🌤️</span><h3>Cek Cuaca</h3></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+            <input type="text" id="kota-input" class="form-control" placeholder="Nama kota: Jakarta, Surabaya..." />
+            <button class="btn btn-primary" id="btn-cuaca" onclick="cekCuaca()">🌤️ Cek</button>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+            <span class="kota-chip" onclick="quickCuaca('Jakarta')">Jakarta</span>
+            <span class="kota-chip" onclick="quickCuaca('Surabaya')">Surabaya</span>
+            <span class="kota-chip" onclick="quickCuaca('Bandung')">Bandung</span>
+            <span class="kota-chip" onclick="quickCuaca('Bali')">Bali</span>
+            <span class="kota-chip" onclick="quickCuaca('Yogyakarta')">Jogja</span>
+            <span class="kota-chip" onclick="quickCuaca('Medan')">Medan</span>
+          </div>
+          <div id="cuaca-result"></div>
+        </div>
+      </div>
+
+      <!-- ── BERITA ── -->
+      <div id="tab-berita" style="display:none">
+        <div class="card">
+          <div class="card-header"><span class="icon">📰</span><h3>Berita Terkini</h3></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+            <input type="text" id="berita-query" class="form-control" placeholder="Topik: Indonesia, teknologi, olahraga..." />
+            <button class="btn btn-primary" id="btn-berita" onclick="cariBerita()">🔍 Cari</button>
+          </div>
+          <div id="berita-result"><p style="color:var(--text-secondary);text-align:center;padding:20px">Masukkan topik untuk mencari berita</p></div>
+        </div>
+      </div>
+
+      <!-- ── TTS ── -->
+      <div id="tab-tts" style="display:none">
+        <div class="card">
+          <div class="card-header"><span class="icon">🔊</span><h3>Text-to-Speech</h3></div>
+          <label class="form-label">Teks (maks 500 karakter)</label>
+          <textarea id="tts-text" class="form-control" rows="4" placeholder="Ketik teks yang ingin diucapkan..." maxlength="500"></textarea>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+            <div style="flex:1;min-width:120px">
+              <label class="form-label">Bahasa</label>
+              <select id="tts-lang" class="form-control">
+                <option value="id">🇮🇩 Indonesia</option>
+                <option value="en">🇺🇸 English</option>
+                <option value="jv">☕ Jawa</option>
+              </select>
+            </div>
+            <div style="flex:1;min-width:120px">
+              <label class="form-label">Kecepatan</label>
+              <select id="tts-speed" class="form-control">
+                <option value="slow">🐢 Lambat</option>
+                <option value="normal" selected>⚡ Normal</option>
+                <option value="fast">🚀 Cepat</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-block" id="btn-tts" onclick="generateTTS()">🔊 Putar TTS</button>
+          <audio id="tts-audio" class="audio-player" controls></audio>
+        </div>
+      </div>
+
+      <!-- ── REMOVE BG ── -->
+      <div id="tab-removebg" style="display:none">
+        <div class="card">
+          <div class="card-header"><span class="icon">✂️</span><h3>Hapus Background Foto</h3></div>
+          <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px">
+            Hapus background foto secara otomatis menggunakan Remove.bg API.
+            Pastikan <code>REMOVE_BG_API_KEY</code> sudah diisi di <code>.env</code>
+          </p>
+          <input type="file" id="bg-file" accept="image/*" class="form-control" style="margin-bottom:10px" onchange="previewBg(event)" />
+          <div id="bg-preview" style="display:none;margin-bottom:12px">
+            <img id="bg-preview-img" style="max-width:220px;border-radius:8px;border:1px solid var(--border)" alt="preview" />
+          </div>
+          <button class="btn btn-primary btn-block" id="btn-removebg" onclick="removeBg()">✂️ Hapus Background</button>
+          <div id="bg-result" class="result-box" style="text-align:center">
+            <img id="bg-result-img" style="max-width:300px;border-radius:8px" alt="hasil" />
+            <div style="margin-top:10px">
+              <a id="bg-download" class="btn btn-success btn-sm" download="nobg.png">⬇️ Download PNG</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="toast-container"></div>
+    </main>
+  </div>
+</div>
+<script>initTools();</script>
+</body>
+</html>
