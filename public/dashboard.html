@@ -9,6 +9,10 @@
   </head>
   <body>
     <div class="app-layout">
+
+      <!-- ════════════════════════════════════════
+           SIDEBAR
+           ════════════════════════════════════════ -->
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-logo">
           <span class="logo-icon">⚔️</span>
@@ -19,8 +23,10 @@
         </div>
 
         <nav class="sidebar-nav">
+
+          <!-- ── UTAMA ── -->
           <div class="nav-section">Utama</div>
-          <a class="nav-item active" href="/dashboard.html" data-page="home">
+          <a class="nav-item active" href="/dashboard.html">
             <span class="nav-icon">🏠</span> Dashboard
           </a>
           <a class="nav-item" href="/pages/profile.html">
@@ -29,10 +35,17 @@
           <a class="nav-item" href="/chat.html">
             <span class="nav-icon">💬</span> Live Chat
           </a>
+          <a class="nav-item" href="/pages/leaderboard.html">
+            <span class="nav-icon">🏆</span> Leaderboard
+          </a>
 
-          <div class="nav-section">Kehidupan & Ekonomi</div>
+          <!-- ── EKONOMI & KEUANGAN ── -->
+          <div class="nav-section">Ekonomi & Keuangan</div>
           <a class="nav-item" href="/pages/economy.html">
             <span class="nav-icon">💰</span> Ekonomi & Bank
+          </a>
+          <a class="nav-item" href="/pages/bank.html">
+            <span class="nav-icon">🏦</span> Bank & Rob
           </a>
           <a class="nav-item" href="/pages/jobs.html">
             <span class="nav-icon">💼</span> Pekerjaan
@@ -41,14 +54,19 @@
             <span class="nav-icon">❤️</span> Survival
           </a>
 
-          <div class="nav-section">Games</div>
-          <a class="nav-item" href="/pages/games.html">
-            <span class="nav-icon">🎮</span> Casino & Games
+          <!-- ── INVESTASI ── -->
+          <div class="nav-section">Investasi</div>
+          <a class="nav-item" href="/pages/crypto.html">
+            <span class="nav-icon">₿</span> Crypto
           </a>
-          <a class="nav-item" href="/pages/minigames.html">
-            <span class="nav-icon">🎲</span> Mini Games
+          <a class="nav-item" href="/pages/stocks.html">
+            <span class="nav-icon">📈</span> Saham IDX
+          </a>
+          <a class="nav-item" href="/pages/valas.html">
+            <span class="nav-icon">💱</span> Valas & Emas
           </a>
 
+          <!-- ── BISNIS ── -->
           <div class="nav-section">Bisnis</div>
           <a class="nav-item" href="/pages/farming.html">
             <span class="nav-icon">🌾</span> Farming
@@ -59,10 +77,26 @@
           <a class="nav-item" href="/pages/mining.html">
             <span class="nav-icon">⛏️</span> Mining
           </a>
+          <a class="nav-item" href="/pages/pabrik.html">
+            <span class="nav-icon">🏭</span> Pabrik
+          </a>
           <a class="nav-item" href="/pages/property.html">
             <span class="nav-icon">🏢</span> Properti
           </a>
 
+          <!-- ── GAMES & BATTLE ── -->
+          <div class="nav-section">Games & Battle</div>
+          <a class="nav-item" href="/pages/games.html">
+            <span class="nav-icon">🎰</span> Casino & Games
+          </a>
+          <a class="nav-item" href="/pages/minigames.html">
+            <span class="nav-icon">🎲</span> Mini Games
+          </a>
+          <a class="nav-item" href="/pages/battle.html">
+            <span class="nav-icon">⚔️</span> PvP Battle
+          </a>
+
+          <!-- ── AI & TOOLS ── -->
           <div class="nav-section">AI & Tools</div>
           <a class="nav-item" href="/pages/ai.html">
             <span class="nav-icon">🤖</span> AI Chat
@@ -70,14 +104,22 @@
           <a class="nav-item" href="/pages/tools.html">
             <span class="nav-icon">🛠️</span> Tools & Utilitas
           </a>
-          <a class="nav-item" href="/pages/leaderboard.html">
-            <span class="nav-icon">🏆</span> Leaderboard
+          <a class="nav-item" href="/pages/reminder.html">
+            <span class="nav-icon">⏰</span> Reminder
+          </a>
+          <a class="nav-item" href="/pages/zodiak.html">
+            <span class="nav-icon">♈</span> Zodiak & Horoskop
+          </a>
+          <a class="nav-item" href="/pages/shortlink.html">
+            <span class="nav-icon">🔗</span> URL Shortener
           </a>
 
+          <!-- ── ADMIN ── -->
           <div class="nav-section admin-only hidden">Admin</div>
           <a class="nav-item admin-only hidden" href="/pages/admin.html">
             <span class="nav-icon">⚙️</span> Panel Admin
           </a>
+
         </nav>
 
         <div class="sidebar-footer">
@@ -94,18 +136,23 @@
         </div>
       </aside>
 
+      <!-- ════════════════════════════════════════
+           MAIN CONTENT
+           ════════════════════════════════════════ -->
       <div class="main-content">
         <header class="topbar">
-          <div class="topbar-left" style="display: flex; align-items: center; gap: 12px">
+          <div class="topbar-left" style="display:flex;align-items:center;gap:12px">
             <button class="hamburger" onclick="toggleSidebar()">☰</button>
             <span class="topbar-title">Dashboard</span>
           </div>
           <div class="topbar-actions">
-            <span id="topbar-greeting" style="font-size: 13px; color: var(--text-secondary)"></span>
+            <span id="topbar-greeting" style="font-size:13px;color:var(--text-secondary)"></span>
           </div>
         </header>
 
         <main class="content-area">
+
+          <!-- ── Stat Cards ── -->
           <div class="status-grid" id="status-grid">
             <div class="stat-card">
               <div class="stat-value" id="stat-balance">...</div>
@@ -125,34 +172,35 @@
             </div>
           </div>
 
-          <div class="card" style="margin-bottom: 20px">
+          <!-- ── Status Vital ── -->
+          <div class="card" style="margin-bottom:20px">
             <div class="card-header">
               <span class="icon">🩺</span>
               <h3>Status Vital</h3>
               <span id="dead-badge" class="badge badge-banned hidden">💀 MATI</span>
-              <span id="sleep-badge" class="badge hidden" style="background: var(--accent-blue); color: #000">😴 TIDUR</span>
+              <span id="sleep-badge" class="badge hidden" style="background:var(--accent-blue);color:#000">😴 TIDUR</span>
             </div>
             <div>
-              <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
                 <span>❤️ HP</span><span id="hp-val">100%</span>
               </div>
               <div class="progress-bar-container">
-                <div class="progress-bar hp" id="hp-bar" style="width: 100%"></div>
+                <div class="progress-bar hp" id="hp-bar" style="width:100%"></div>
               </div>
-              <div style="display: flex; justify-content: space-between; font-size: 13px; margin: 8px 0 4px;">
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin:8px 0 4px">
                 <span>🍗 Lapar</span><span id="hunger-val">100%</span>
               </div>
               <div class="progress-bar-container">
-                <div class="progress-bar hunger" id="hunger-bar" style="width: 100%"></div>
+                <div class="progress-bar hunger" id="hunger-bar" style="width:100%"></div>
               </div>
-              <div style="display: flex; justify-content: space-between; font-size: 13px; margin: 8px 0 4px;">
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin:8px 0 4px">
                 <span>⚡ Energi</span><span id="energy-val">100%</span>
               </div>
               <div class="progress-bar-container">
-                <div class="progress-bar energy" id="energy-bar" style="width: 100%"></div>
+                <div class="progress-bar energy" id="energy-bar" style="width:100%"></div>
               </div>
             </div>
-            <div style="display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap">
+            <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
               <button class="btn btn-primary btn-sm" onclick="quickAction('makan')">🍗 Makan (Rp50jt)</button>
               <button class="btn btn-secondary btn-sm" onclick="quickAction('daily')">🎁 Daily</button>
               <button class="btn btn-secondary btn-sm" onclick="quickAction('revive')">🏥 RS/Revive</button>
@@ -161,109 +209,163 @@
             </div>
           </div>
 
-          <h3 style="margin-bottom: 14px">🎮 Fitur Tersedia</h3>
+          <!-- ═══════════════════════════════
+               FITUR TERSEDIA — PER KATEGORI
+               ═══════════════════════════════ -->
+          <h3 style="margin-bottom:16px">🎮 Fitur Tersedia</h3>
+
+          <!-- EKONOMI & KEUANGAN -->
+          <p class="section-label">💰 Ekonomi & Keuangan</p>
           <div class="feature-grid">
-            <div class="feature-card" onclick="location.href = '/pages/economy.html'">
+            <div class="feature-card" onclick="location.href='/pages/economy.html'">
               <span class="feature-icon">💰</span>
               <div class="feature-name">Ekonomi & Bank</div>
-              <div class="feature-desc">Daily, transfer, deposit, rob</div>
+              <div class="feature-desc">Daily, transfer, deposit</div>
             </div>
-            <div class="feature-card" onclick="location.href = '/pages/games.html'">
-              <span class="feature-icon">🎰</span>
-              <div class="feature-name">Casino & Games</div>
-              <div class="feature-desc">Casino, slot, roulette, duel</div>
+            <div class="feature-card" onclick="location.href='/pages/bank.html'">
+              <span class="feature-icon">🏦</span>
+              <div class="feature-name">Bank & Rob</div>
+              <div class="feature-desc">Kelola keuangan & rampok</div>
             </div>
-            <div class="feature-card" onclick="location.href = '/pages/farming.html'">
-              <span class="feature-icon">🌾</span>
-              <div class="feature-name">Farming</div>
-              <div class="feature-desc">Tanam, panen, olah hasil</div>
-            </div>
-            <div class="feature-card" onclick="location.href = '/pages/ternak.html'">
-              <span class="feature-icon">🐄</span>
-              <div class="feature-name">Peternakan</div>
-              <div class="feature-desc">Beli, pakan, jual hewan</div>
-            </div>
-            <div class="feature-card" onclick="location.href = '/pages/mining.html'">
-              <span class="feature-icon">⛏️</span>
-              <div class="feature-name">Mining</div>
-              <div class="feature-desc">GPU rig, BTC mining</div>
-            </div>
-            <div class="feature-card" onclick="location.href = '/pages/property.html'">
-              <span class="feature-icon">🏢</span>
-              <div class="feature-name">Properti</div>
-              <div class="feature-desc">Usaha pasif income</div>
-            </div>
-            <div class="feature-card" onclick="location.href = '/pages/jobs.html'">
+            <div class="feature-card" onclick="location.href='/pages/jobs.html'">
               <span class="feature-icon">💼</span>
               <div class="feature-name">Pekerjaan</div>
               <div class="feature-desc">Lamar kerja, ambil gaji</div>
             </div>
-            <div class="feature-card" onclick="location.href = '/chat.html'">
-              <span class="feature-icon">💬</span>
-              <div class="feature-name">Live Chat</div>
-              <div class="feature-desc">10 room + DM privat</div>
+            <div class="feature-card" onclick="location.href='/pages/life.html'">
+              <span class="feature-icon">❤️</span>
+              <div class="feature-name">Survival</div>
+              <div class="feature-desc">HP, lapar, energi, tidur</div>
             </div>
-            <div class="feature-card" onclick="location.href = '/pages/ai.html'">
+          </div>
+
+          <!-- INVESTASI -->
+          <p class="section-label">📊 Investasi</p>
+          <div class="feature-grid">
+            <div class="feature-card" onclick="location.href='/pages/crypto.html'">
+              <span class="feature-icon">₿</span>
+              <div class="feature-name">Crypto</div>
+              <div class="feature-desc">Beli & jual aset kripto</div>
+            </div>
+            <div class="feature-card" onclick="location.href='/pages/stocks.html'">
+              <span class="feature-icon">📈</span>
+              <div class="feature-name">Saham IDX</div>
+              <div class="feature-desc">Beli & jual saham BEI real-time</div>
+            </div>
+            <div class="feature-card" onclick="location.href='/pages/valas.html'">
+              <span class="feature-icon">💱</span>
+              <div class="feature-name">Valas & Emas</div>
+              <div class="feature-desc">Investasi mata uang & emas</div>
+            </div>
+          </div>
+
+          <!-- BISNIS -->
+          <p class="section-label">🏭 Bisnis</p>
+          <div class="feature-grid">
+            <div class="feature-card" onclick="location.href='/pages/farming.html'">
+              <span class="feature-icon">🌾</span>
+              <div class="feature-name">Farming</div>
+              <div class="feature-desc">Tanam, panen, olah hasil</div>
+            </div>
+            <div class="feature-card" onclick="location.href='/pages/ternak.html'">
+              <span class="feature-icon">🐄</span>
+              <div class="feature-name">Peternakan</div>
+              <div class="feature-desc">Beli, pakan, jual hewan</div>
+            </div>
+            <div class="feature-card" onclick="location.href='/pages/mining.html'">
+              <span class="feature-icon">⛏️</span>
+              <div class="feature-name">Mining</div>
+              <div class="feature-desc">GPU rig, BTC mining</div>
+            </div>
+            <div class="feature-card" onclick="location.href='/pages/pabrik.html'">
+              <span class="feature-icon">🏭</span>
+              <div class="feature-name">Pabrik</div>
+              <div class="feature-desc">Craft produk dari hasil ternak</div>
+            </div>
+            <div class="feature-card" onclick="location.href='/pages/property.html'">
+              <span class="feature-icon">🏢</span>
+              <div class="feature-name">Properti</div>
+              <div class="feature-desc">Usaha pasif income</div>
+            </div>
+          </div>
+
+          <!-- GAMES & BATTLE -->
+          <p class="section-label">🎮 Games & Battle</p>
+          <div class="feature-grid">
+            <div class="feature-card" onclick="location.href='/pages/games.html'">
+              <span class="feature-icon">🎰</span>
+              <div class="feature-name">Casino & Games</div>
+              <div class="feature-desc">Casino, slot, roulette, duel</div>
+            </div>
+            <div class="feature-card" onclick="location.href='/pages/minigames.html'">
+              <span class="feature-icon">🎲</span>
+              <div class="feature-name">Mini Games</div>
+              <div class="feature-desc">Tebak angka, dadu, wordle</div>
+            </div>
+            <div class="feature-card" onclick="location.href='/pages/battle.html'">
+              <span class="feature-icon">⚔️</span>
+              <div class="feature-name">PvP Battle</div>
+              <div class="feature-desc">Duel & battle lawan pemain lain</div>
+            </div>
+          </div>
+
+          <!-- AI & TOOLS -->
+          <p class="section-label">🤖 AI & Tools</p>
+          <div class="feature-grid">
+            <div class="feature-card" onclick="location.href='/pages/ai.html'">
               <span class="feature-icon">🤖</span>
               <div class="feature-name">AI Chat</div>
               <div class="feature-desc">Obrolan AI cerdas</div>
             </div>
-            <div class="feature-card" onclick="location.href = '/pages/tools.html'">
+            <div class="feature-card" onclick="location.href='/pages/tools.html'">
               <span class="feature-icon">🛠️</span>
-              <div class="feature-name">Tools</div>
-              <div class="feature-desc">Remove BG, TTS, cuaca</div>
+              <div class="feature-name">Tools & Utilitas</div>
+              <div class="feature-desc">QR, password, cuaca, TTS</div>
             </div>
-            <div class="feature-card" onclick="location.href = '/pages/leaderboard.html'">
+            <div class="feature-card" onclick="location.href='/pages/reminder.html'">
+              <span class="feature-icon">⏰</span>
+              <div class="feature-name">Reminder</div>
+              <div class="feature-desc">Set pengingat otomatis</div>
+            </div>
+            <div class="feature-card" onclick="location.href='/pages/zodiak.html'">
+              <span class="feature-icon">♈</span>
+              <div class="feature-name">Zodiak & Horoskop</div>
+              <div class="feature-desc">Horoskop AI, kecocokan, shio</div>
+            </div>
+            <div class="feature-card" onclick="location.href='/pages/shortlink.html'">
+              <span class="feature-icon">🔗</span>
+              <div class="feature-name">URL Shortener</div>
+              <div class="feature-desc">Persingkat & ungkap link</div>
+            </div>
+            <div class="feature-card" onclick="location.href='/chat.html'">
+              <span class="feature-icon">💬</span>
+              <div class="feature-name">Live Chat</div>
+              <div class="feature-desc">10 room + DM privat</div>
+            </div>
+            <div class="feature-card" onclick="location.href='/pages/leaderboard.html'">
               <span class="feature-icon">🏆</span>
               <div class="feature-name">Leaderboard</div>
               <div class="feature-desc">Ranking terkaya</div>
             </div>
-            <div class="feature-card" onclick="location.href = '/pages/crypto.html'">
-              <span class="feature-icon">🏆</span>
-              <div class="feature-name">Crypto</div>
-              <div class="feature-desc">Crypto</div>
-            </div>
+          </div>
 
-            <div class="feature-card" onclick="location.href='/pages/stocks.html'">
-              <div class="feature-icon">📈</div>
-              <div class="feature-name">Saham IDX</div>
-              <div class="feature-desc">Beli & jual saham BEI real-time</div>
-            </div>
-            
-            <div class="feature-card" onclick="location.href='/pages/valas.html'">
-              <div class="feature-icon">💱</div>
-              <div class="feature-name">Valas & Emas</div>
-              <div class="feature-desc">Investasi mata uang & emas</div>
-            </div>
-            
-            <div class="feature-card" onclick="location.href='/pages/battle.html'">
-              <div class="feature-icon">⚔️</div>
-              <div class="feature-name">PvP Battle</div>
-              <div class="feature-desc">Duel & battle lawan pemain lain</div>
-            </div>
-            
-            <div class="feature-card" onclick="location.href='/pages/bank.html'">
-              <div class="feature-icon">🏦</div>
-              <div class="feature-name">Bank & Rob</div>
-              <div class="feature-desc">Kelola keuangan & rampok</div>
-            </div>
-            
-            <div class="feature-card" onclick="location.href='/pages/pabrik.html'">
-              <div class="feature-icon">🏭</div>
-              <div class="feature-name">Pabrik</div>
-              <div class="feature-desc">Craft produk dari hasil ternak</div>
-            </div>
-
-            <div class="feature-card admin-only hidden" onclick="location.href = '/pages/admin.html'">
-              <span class="feature-icon">⚙️</span>
-              <div class="feature-name">Panel Admin</div>
-              <div class="feature-desc">Kelola user & sistem</div>
+          <!-- ADMIN (hidden by default, JS unhides jika role admin) -->
+          <div class="admin-only hidden">
+            <p class="section-label">⚙️ Admin</p>
+            <div class="feature-grid">
+              <div class="feature-card" onclick="location.href='/pages/admin.html'">
+                <span class="feature-icon">⚙️</span>
+                <div class="feature-name">Panel Admin</div>
+                <div class="feature-desc">Kelola user & sistem</div>
+              </div>
             </div>
           </div>
+
         </main>
       </div>
     </div>
 
+    <!-- Modal Tidur -->
     <div class="modal-backdrop hidden" id="sleep-modal">
       <div class="modal">
         <div class="modal-header">
@@ -284,5 +386,26 @@
     <div id="toast-container"></div>
     <script src="/js/api.js"></script>
     <script src="/js/dashboard.js"></script>
+
+    <style>
+      .section-label {
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        font-weight: 700;
+        margin: 20px 0 8px;
+      }
+      .section-label:first-of-type { margin-top: 0; }
+
+      /*
+        FIX: auto-fill → auto-fit
+        auto-fill = kolom kosong tetap ada → kartu kumpul di kiri
+        auto-fit  = kolom kosong collapse  → kartu mengembang penuh
+      */
+      .feature-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+    </style>
   </body>
-</html>
+</html> 
