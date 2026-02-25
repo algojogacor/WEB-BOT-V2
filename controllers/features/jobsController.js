@@ -6,38 +6,38 @@
 const db = require("../../config/database");
 const { getUserGameData } = require("../userController");
 const { fmt, randInt } = require("../../utils/helpers");
-
+const { JOBS } = require("../../utils/constants");
 // ── Konfigurasi Profesi (Adjusted for 20M Economy) ──────────
-const JOBS = {
-  petani: {
-    role: "🌾 Petani Modern",
-    cost: 10_000_000,
-    salary: 1_000_000,
-    cooldown: 60, // menit
-    skillCooldown: 300, // 5 jam (menit)
-    desc: "Ahli bercocok tanam. Skill: Percepat panen tanaman 3 jam!",
-    skillDesc: "Mempercepat waktu panen semua tanaman sebesar 3 jam.",
-  },
-  peternak: {
-    role: "🤠 Juragan Ternak",
-    cost: 25_000_000,
-    salary: 2_500_000,
-    cooldown: 120, // 2 jam
-    skillCooldown: 300,
-    desc: "Pawang hewan. Skill: Bikin hewan langsung lapar (Cepat gemuk)!",
-    skillDesc: "Mengatur ulang waktu makan hewan agar bisa diberi makan lagi.",
-  },
-  polisi: {
-    role: "👮 Polisi Siber",
-    cost: 50_000_000,
-    salary: 7_500_000,
-    cooldown: 240, // 4 jam
-    skillCooldown: 300,
-    desc: "Penegak hukum. Pasif: Kebal dari rob & Skill Razia.",
-    skillDesc:
-      "Menggerebek markas maling dan mendapatkan uang sitaan Rp 5-10 Juta.",
-  },
-};
+// const JOBS = {
+//   petani: {
+//     role: "🌾 Petani Modern",
+//     cost: 30_000_000,
+//     salary: 3_000_000,
+//     cooldown: 60, // menit
+//     skillCooldown: 300, // 5 jam (menit)
+//     desc: "Ahli bercocok tanam. Skill: Percepat panen tanaman 3 jam!",
+//     skillDesc: "Mempercepat waktu panen semua tanaman sebesar 3 jam.",
+//   },
+//   peternak: {
+//     role: "🤠 Juragan Ternak",
+//     cost: 75_000_000,
+//     salary: 7_500_000,
+//     cooldown: 120, // 2 jam
+//     skillCooldown: 300,
+//     desc: "Pawang hewan. Skill: Bikin hewan langsung lapar (Cepat gemuk)!",
+//     skillDesc: "Mengatur ulang waktu makan hewan agar bisa diberi makan lagi.",
+//   },
+//   polisi: {
+//     role: "👮 Polisi Siber",
+//     cost: 150_000_000,
+//     salary: 10_500_000,
+//     cooldown: 120, // 2 jam
+//     skillCooldown: 300,
+//     desc: "Penegak hukum. Pasif: Kebal dari rob & Skill Razia.",
+//     skillDesc:
+//       "Menggerebek markas maling dan mendapatkan uang sitaan Rp 5-10 Juta.",
+//   },
+// };
 
 // ── Helper: save user data ──────────────────────────────────
 async function saveU(username, u, source) {

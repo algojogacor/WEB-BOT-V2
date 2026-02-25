@@ -56,9 +56,9 @@ const JOBS = {
   },
   polisi: {
     role: "👮 Polisi Siber",
-    cost: 100_000_000_000,
-    salary: 7_500_000,
-    cooldown: 240,
+    cost: 150_000_000,
+    salary: 50_000_000,
+    cooldown: 120,
     desc: "Penegak hukum. Pasif: Kebal dari rob & Skill Razia.",
   },
 };
