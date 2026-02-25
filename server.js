@@ -22,6 +22,7 @@ const IS_VERCEL = !!process.env.VERCEL;
 const app = express();
 
 app.set('trust proxy', 1);
+
 // ── 1. Security Middleware ────────────────────────────────────
 app.use(
   helmet({
@@ -29,45 +30,53 @@ app.use(
       directives: {
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com"],
-        scriptSrcAttr: ["'unsafe-inline'"], // Fix: izinkan onclick="..." di HTML
+        scriptSrcAttr: ["'unsafe-inline'"],
         styleSrc: ["'self'", "'unsafe-inline'", "fonts.googleapis.com"],
         fontSrc: ["'self'", "fonts.gstatic.com"],
-        imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'", "wss:", "ws:"],
+        // Perbaikan: Tambahkan 'blob:' dan 'data:' untuk jaga-jaga render gambar AI di frontend
+        imgSrc: ["'self'", "data:", "blob:", "https:"], 
+        // Perbaikan: Izinkan koneksi API eksternal jika frontend fetch langsung
+        connectSrc: ["'self'", "wss:", "ws:", "https://*.openrouter.ai", "https://*.pollinations.ai"],
       },
     },
   }),
 );
+
 app.use(cors({ origin: process.env.APP_URL || "*", credentials: true }));
-app.use(mongoSanitize()); // Cegah NoSQL injection
-app.use(xssClean()); // Sanitasi XSS
-app.use(globalLimiter); // Rate limit global
+app.use(mongoSanitize());
+app.use(xssClean());
+app.use(globalLimiter);
 
 // ── 2. Body Parser ────────────────────────────────────────────
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 
-// ── 3. Database Connection Middleware (for Vercel cold starts) ─
-// Ensures MongoDB is connected before any request is processed.
-// On local dev, boot() already calls connectDB(), but this is a
-// safety net for serverless environments where boot() doesn't run.
-app.use(async (req, res, next) => {
+// ── 3. Static Files (PINDAHKAN KE SINI!) ──────────────────────
+// Lakukan ini SEBELUM koneksi DB, agar file statis langsung dikirim tanpa membebani DB
+app.use(express.static(path.join(__dirname, "public")));
+
+// ── 4. Database Middleware (KHUSUS API) ───────────────────────
+app.use("/api", async (req, res, next) => {
   try {
     await connectDB();
     next();
   } catch (err) {
     console.error("❌ DB connection failed:", err.message);
-    next(err);
+    // Kirim respons JSON jika DB gagal, bukan error HTML
+    res.status(500).json({ success: false, message: "Database connection failed" });
   }
 });
-
-// ── 4. Static Files ───────────────────────────────────────────
-app.use(express.static(path.join(__dirname, "public")));
 
 // ── 5. API Routes ─────────────────────────────────────────────
 app.use("/api", routes);
 
-// ── 6. SPA Catch-all (kirim index.html untuk semua route lain) ─
+// ── 5. Penanganan Error 404 Khusus API ──────────────────────
+// Mencegah request API yang salah alamat nyasar ke index.html
+app.use("/api/*", (req, res) => {
+  res.status(404).json({ success: false, message: "API Endpoint tidak ditemukan." });
+});
+
+// ── 6. SPA Catch-all (Untuk React/Vue/Vanilla Router) ─────────
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
