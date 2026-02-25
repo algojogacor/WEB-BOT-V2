@@ -144,4 +144,20 @@ router.post('/pabrik/craft',        gameLimiter, pabrik.craft);
 router.post('/pabrik/sell',         gameLimiter, pabrik.sellProduct);
 router.post('/pabrik/add-inventory',pabrik.addToInventory);
 
+// ── Reminder ─────────────────────────────────────────────────
+const reminder = require('../controllers/features/reminderController');
+router.get('/reminder', reminder.getReminders);
+router.post('/reminder/create', reminder.createReminder);
+router.delete('/reminder/:id', reminder.deleteReminder);
+router.post('/reminder/clear', reminder.clearReminders);
+
+// ── Zodiak ───────────────────────────────────────────────────
+const zodiak = require('../controllers/features/zodiakController');
+router.post('/zodiak/horoskop', zodiak.getHoroskop);
+
+// ── Shortlink ─────────────────────────────────────────────────
+const shortlink = require('../controllers/features/shortlinkController');
+router.post('/tools/shorten', shortlink.shorten);
+router.post('/tools/unshorten', shortlink.unshorten);
+
 module.exports = router;
