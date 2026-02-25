@@ -86,13 +86,8 @@
         font-size: 12px;
       }
       @keyframes pulse {
-        0%,
-        100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.6;
-        }
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
       }
       .profit-badge {
         font-size: 11px;
@@ -101,6 +96,54 @@
         border-radius: 20px;
         padding: 2px 10px;
         font-weight: 700;
+      }
+      /* ── Loading state untuk button ── */
+      .btn[disabled], .btn.loading {
+        opacity: 0.55;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+      /* ── Error alert di dalam card ── */
+      .alert-danger {
+        background: rgba(255, 71, 87, 0.12);
+        color: #ff4757;
+        border: 1px solid rgba(255, 71, 87, 0.3);
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 13px;
+        margin-bottom: 10px;
+      }
+      /* ── Debug log panel (collapse) ── */
+      #debug-panel {
+        position: fixed;
+        bottom: 12px;
+        right: 12px;
+        width: 360px;
+        max-height: 220px;
+        background: rgba(0,0,0,0.88);
+        color: #39c557;
+        font-family: monospace;
+        font-size: 11px;
+        border-radius: 10px;
+        overflow-y: auto;
+        padding: 10px 12px;
+        z-index: 9999;
+        display: none;
+        border: 1px solid #39c557;
+      }
+      #debug-toggle {
+        position: fixed;
+        bottom: 12px;
+        right: 12px;
+        z-index: 10000;
+        background: #181818;
+        color: #39c557;
+        border: 1px solid #39c557;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        cursor: pointer;
+        font-family: monospace;
       }
     </style>
   </head>
@@ -116,59 +159,27 @@
         </div>
         <nav class="sidebar-nav">
           <div class="nav-section">Utama</div>
-          <a class="nav-item" href="/dashboard.html"
-            ><span class="nav-icon">🏠</span> Dashboard</a
-          >
-          <a class="nav-item" href="/pages/profile.html"
-            ><span class="nav-icon">👤</span> Profil & Status</a
-          >
-          <a class="nav-item" href="/chat.html"
-            ><span class="nav-icon">💬</span> Live Chat</a
-          >
+          <a class="nav-item" href="/dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a>
+          <a class="nav-item" href="/pages/profile.html"><span class="nav-icon">👤</span> Profil & Status</a>
+          <a class="nav-item" href="/chat.html"><span class="nav-icon">💬</span> Live Chat</a>
           <div class="nav-section">Kehidupan & Ekonomi</div>
-          <a class="nav-item" href="/pages/economy.html"
-            ><span class="nav-icon">💰</span> Ekonomi & Bank</a
-          >
-          <a class="nav-item" href="/pages/jobs.html"
-            ><span class="nav-icon">💼</span> Pekerjaan</a
-          >
-          <a class="nav-item" href="/pages/life.html"
-            ><span class="nav-icon">❤️</span> Survival</a
-          >
+          <a class="nav-item" href="/pages/economy.html"><span class="nav-icon">💰</span> Ekonomi & Bank</a>
+          <a class="nav-item" href="/pages/jobs.html"><span class="nav-icon">💼</span> Pekerjaan</a>
+          <a class="nav-item" href="/pages/life.html"><span class="nav-icon">❤️</span> Survival</a>
           <div class="nav-section">Games</div>
-          <a class="nav-item" href="/pages/games.html"
-            ><span class="nav-icon">🎮</span> Casino & Games</a
-          >
-          <a class="nav-item" href="/pages/minigames.html"
-            ><span class="nav-icon">🎲</span> Mini Games</a
-          >
+          <a class="nav-item" href="/pages/games.html"><span class="nav-icon">🎮</span> Casino & Games</a>
+          <a class="nav-item" href="/pages/minigames.html"><span class="nav-icon">🎲</span> Mini Games</a>
           <div class="nav-section">Bisnis</div>
-          <a class="nav-item" href="/pages/farming.html"
-            ><span class="nav-icon">🌾</span> Farming</a
-          >
-          <a class="nav-item active" href="/pages/ternak.html"
-            ><span class="nav-icon">🐄</span> Peternakan</a
-          >
-          <a class="nav-item" href="/pages/mining.html"
-            ><span class="nav-icon">⛏️</span> Mining</a
-          >
-          <a class="nav-item" href="/pages/property.html"
-            ><span class="nav-icon">🏢</span> Properti</a
-          >
+          <a class="nav-item" href="/pages/farming.html"><span class="nav-icon">🌾</span> Farming</a>
+          <a class="nav-item active" href="/pages/ternak.html"><span class="nav-icon">🐄</span> Peternakan</a>
+          <a class="nav-item" href="/pages/mining.html"><span class="nav-icon">⛏️</span> Mining</a>
+          <a class="nav-item" href="/pages/property.html"><span class="nav-icon">🏢</span> Properti</a>
           <div class="nav-section">AI & Tools</div>
-          <a class="nav-item" href="/pages/ai.html"
-            ><span class="nav-icon">🤖</span> AI Chat</a
-          >
-          <a class="nav-item" href="/pages/tools.html"
-            ><span class="nav-icon">🛠️</span> Tools & Utilitas</a
-          >
-          <a class="nav-item" href="/pages/leaderboard.html"
-            ><span class="nav-icon">🏆</span> Leaderboard</a
-          >
+          <a class="nav-item" href="/pages/ai.html"><span class="nav-icon">🤖</span> AI Chat</a>
+          <a class="nav-item" href="/pages/tools.html"><span class="nav-icon">🛠️</span> Tools & Utilitas</a>
+          <a class="nav-item" href="/pages/leaderboard.html"><span class="nav-icon">🏆</span> Leaderboard</a>
           <div class="nav-section admin-only hidden">Admin</div>
-          <a class="nav-item admin-only hidden" href="/pages/admin.html"
-            ><span class="nav-icon">⚙️</span> Panel Admin</a
-          >
+          <a class="nav-item admin-only hidden" href="/pages/admin.html"><span class="nav-icon">⚙️</span> Panel Admin</a>
         </nav>
         <div class="sidebar-footer">
           <div class="user-info">
@@ -178,30 +189,26 @@
               <div class="user-role" id="sidebar-role">—</div>
             </div>
           </div>
-          <button class="btn btn-secondary btn-block btn-sm" onclick="logout()">
-            🚪 Logout
-          </button>
+          <button class="btn btn-secondary btn-block btn-sm" onclick="logout()">🚪 Logout</button>
         </div>
       </aside>
 
       <div class="main-content">
         <header class="topbar">
-          <div style="display: flex; align-items: center; gap: 12px">
+          <div style="display:flex;align-items:center;gap:12px">
             <button class="hamburger" onclick="toggleSidebar()">☰</button>
             <span class="topbar-title">🐄 Peternakan</span>
           </div>
-          <div style="font-size: 13px; color: var(--text-secondary)">
-            Saldo:
-            <span
-              id="top-balance"
-              style="font-weight: 700; color: var(--accent-green)"
-              >...</span
-            >
+          <div style="font-size:13px;color:var(--text-secondary)">
+            Saldo: <span id="top-balance" style="font-weight:700;color:var(--accent-green)">...</span>
           </div>
         </header>
 
         <main class="content-area">
-          <div class="status-grid" style="margin-bottom: 20px">
+          <!-- Error Banner global -->
+          <div id="global-error" class="alert-danger hidden" style="margin-bottom:14px"></div>
+
+          <div class="status-grid" style="margin-bottom:20px">
             <div class="stat-card">
               <div class="stat-value" id="stat-total">0</div>
               <div class="stat-label">🐄 Total Hewan</div>
@@ -225,37 +232,28 @@
           </div>
 
           <div class="tabs">
-            <div class="tab active" onclick="switchTab('kandang')">
-              🐄 Kandang Saya
-            </div>
-            <div class="tab" onclick="switchTab('pasar-hewan')">
-              🏪 Beli Hewan
-            </div>
+            <div class="tab active" onclick="switchTab('kandang')">🐄 Kandang Saya</div>
+            <div class="tab" onclick="switchTab('pasar-hewan')">🏪 Beli Hewan</div>
             <div class="tab" onclick="switchTab('panduan')">📖 Panduan</div>
           </div>
 
           <!-- KANDANG -->
           <div id="tab-kandang">
-            <div class="card" style="margin-bottom: 20px">
+            <div class="card" style="margin-bottom:20px">
               <div class="card-header">
                 <span class="icon">🐄</span>
                 <h3>Kandang</h3>
-                <div style="margin-left: auto; display: flex; gap: 8px">
-                  <button
-                    class="btn btn-secondary btn-sm"
-                    onclick="beriPakan()"
-                  >
+                <div style="margin-left:auto;display:flex;gap:8px">
+                  <button class="btn btn-secondary btn-sm" id="btn-pakan" onclick="beriPakan(this)">
                     🍖 Beri Pakan Semua
                   </button>
-                  <button class="btn btn-primary btn-sm" onclick="jualSemua()">
+                  <button class="btn btn-primary btn-sm" id="btn-jual-semua" onclick="jualSemua(this)">
                     💰 Jual Siap Jual
                   </button>
                 </div>
               </div>
               <div id="kandang-list">
-                <div class="alert alert-info">
-                  Kandang kosong. Beli hewan dulu!
-                </div>
+                <div class="alert alert-info">Kandang kosong. Beli hewan dulu!</div>
               </div>
             </div>
           </div>
@@ -278,23 +276,13 @@
                 <span class="icon">📖</span>
                 <h3>Cara Main Peternakan</h3>
               </div>
-              <div style="line-height: 2">
-                <p>
-                  🐄 <b>Beli hewan</b> → hewan masuk kandang dan mulai tumbuh.
-                </p>
-                <p>
-                  🍖 <b>Beri Pakan</b> → mempercepat pertumbuhan hewan (potong 1
-                  jam waktu).
-                </p>
-                <p>
-                  💰 <b>Jual</b> → setelah timer selesai, hewan siap dijual
-                  dengan harga jual.
-                </p>
-                <p>
-                  📈 <b>Profit</b> → harga jual jauh melebihi modal pembelian.
-                </p>
-                <hr style="margin: 16px 0; border-color: var(--border)" />
-                <h4 style="margin-bottom: 12px">📊 Perbandingan Untung-Rugi</h4>
+              <div style="line-height:2">
+                <p>🐄 <b>Beli hewan</b> → hewan masuk kandang dan mulai tumbuh.</p>
+                <p>🍖 <b>Beri Pakan</b> → mempercepat pertumbuhan hewan (potong 1 jam waktu).</p>
+                <p>💰 <b>Jual</b> → setelah timer selesai, hewan siap dijual dengan harga jual.</p>
+                <p>📈 <b>Profit</b> → harga jual jauh melebihi modal pembelian.</p>
+                <hr style="margin:16px 0;border-color:var(--border)" />
+                <h4 style="margin-bottom:12px">📊 Perbandingan Untung-Rugi</h4>
                 <div id="profit-table"></div>
               </div>
             </div>
@@ -304,227 +292,506 @@
     </div>
 
     <div id="toast-container"></div>
+
+    <!-- Debug log panel (tekan tombol [LOG] pojok kanan bawah) -->
+    <button id="debug-toggle" onclick="toggleDebug()">🐛 LOG</button>
+    <div id="debug-panel"></div>
+
     <script src="/js/api.js"></script>
-   <script>
-      const ANIMALS = {
-        ayam: { icon: "🐔", name: "Ayam Kampung", beli: 50000, jual: 250000, durasi: 2, label: "2 jam" },
-        gurame: { icon: "🐟", name: "Ikan Gurame", beli: 200000, jual: 1000000, durasi: 4, label: "4 jam" },
-        kambing: { icon: "🐐", name: "Kambing Etawa", beli: 3000000, jual: 15000000, durasi: 8, label: "8 jam" },
-        sapi: { icon: "🐄", name: "Sapi Brahma", beli: 15000000, jual: 75000000, durasi: 24, label: "24 jam" },
-        kuda: { icon: "🐎", name: "Kuda Pacu", beli: 40000000, jual: 200000000, durasi: 48, label: "48 jam" },
-        unta: { icon: "🐫", name: "Unta Arab", beli: 80000000, jual: 400000000, durasi: 72, label: "72 jam" },
-      };
+    <script>
+    /* ============================================================
+       TERNAK.JS — Frontend Logic (Fixed & Enhanced)
+       ============================================================ */
 
-      let status = { animals: [], balance: 0 };
-      let timers = {};
+    const ANIMALS = {
+      ayam:   { icon: "🐔", name: "Ayam Kampung",  beli: 50000,    jual: 250000,    durasi: 2,  label: "2 jam" },
+      gurame: { icon: "🐟", name: "Ikan Gurame",   beli: 200000,   jual: 1000000,   durasi: 4,  label: "4 jam" },
+      kambing:{ icon: "🐐", name: "Kambing Etawa", beli: 3000000,  jual: 15000000,  durasi: 8,  label: "8 jam" },
+      sapi:   { icon: "🐄", name: "Sapi Brahma",   beli: 15000000, jual: 75000000,  durasi: 24, label: "24 jam" },
+      kuda:   { icon: "🐎", name: "Kuda Pacu",     beli: 40000000, jual: 200000000, durasi: 48, label: "48 jam" },
+      unta:   { icon: "🐫", name: "Unta Arab",     beli: 80000000, jual: 400000000, durasi: 72, label: "72 jam" },
+    };
 
-      function fmt(num) {
-         return Number(num || 0).toLocaleString("id-ID");
+    const MAX_SLOTS = 8;
+
+    let status = { animals: [], balance: 0 };
+    let timers = {};         // interval timers per kandang item
+    let isLoading = false;   // lock global agar tidak double-fetch
+
+    /* ── Logging helper ── */
+    const LOG_LEVELS = { info: '#39c557', warn: '#ffd32a', error: '#ff4757', api: '#70a1ff' };
+    function log(level, ...args) {
+      const msg = args.map(a => (typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a))).join(' ');
+      const time = new Date().toLocaleTimeString('id-ID');
+      const prefix = `[${time}][${level.toUpperCase()}]`;
+
+      // Browser console
+      if (level === 'error') console.error(prefix, ...args);
+      else if (level === 'warn') console.warn(prefix, ...args);
+      else console.log(prefix, ...args);
+
+      // Debug panel
+      const panel = document.getElementById('debug-panel');
+      if (panel) {
+        const line = document.createElement('div');
+        line.style.color = LOG_LEVELS[level] || '#ccc';
+        line.style.marginBottom = '2px';
+        line.textContent = `${prefix} ${msg}`;
+        panel.appendChild(line);
+        panel.scrollTop = panel.scrollHeight;
+        // Batasi 200 baris
+        while (panel.children.length > 200) panel.removeChild(panel.firstChild);
       }
+    }
 
-      function fmtTime(ms) {
-        if (!ms || ms <= 0 || isNaN(ms)) return "✅ SIAP JUAL";
-        const m = Math.floor(ms / 60000),
-          h = Math.floor(m / 60),
-          d = Math.floor(h / 24);
-        if (d > 0) return `${d}h ${h % 24}j ${m % 60}m`;
-        if (h > 0) return `${h}j ${m % 60}m`;
-        return `${m}m`;
+    function toggleDebug() {
+      const panel = document.getElementById('debug-panel');
+      const btn = document.getElementById('debug-toggle');
+      if (panel.style.display === 'none' || !panel.style.display) {
+        panel.style.display = 'block';
+        btn.style.bottom = (220 + 12) + 'px';
+      } else {
+        panel.style.display = 'none';
+        btn.style.bottom = '12px';
       }
+    }
 
-      async function load() {
-        try {
-          // Ambil dari file API
-          const r = await api.get("/features/ternak");
-          
-          // Debugging: Lihat struktur asli dari backend
-          console.log("Data dari API:", r); 
+    /* ── Format helpers ── */
+    function fmt(num) { return Number(num || 0).toLocaleString('id-ID'); }
+    function fmtTime(ms) {
+      if (!ms || ms <= 0 || isNaN(ms)) return '✅ SIAP JUAL';
+      if (ms < 60000) return '< 1m'; // sisa kurang dari 1 menit
+      const totalMin = Math.floor(ms / 60000);
+      const d = Math.floor(totalMin / 1440);
+      const h = Math.floor((totalMin % 1440) / 60);
+      const m = totalMin % 60;
+      if (d > 0) return `${d}h ${h}j ${m}m`;
+      if (h > 0) return `${h}j ${m}m`;
+      return `${m}m`;
+    }
 
-          // Fallback agar tidak crash jika r.animals kosong/undefined
-          status = r || { animals: [], balance: 0 }; 
-          const animalsData = status.animals || [];
-          const balance = status.balance || 0;
+    /* ── Global error banner ── */
+    function showGlobalError(msg) {
+      const el = document.getElementById('global-error');
+      el.textContent = '⚠️ ' + msg;
+      el.classList.remove('hidden');
+      setTimeout(() => el.classList.add('hidden'), 8000);
+    }
+    function hideGlobalError() {
+      document.getElementById('global-error').classList.add('hidden');
+    }
 
-          document.getElementById("top-balance").textContent = "Rp" + fmt(balance);
-          document.getElementById("stat-balance").textContent = "Rp" + fmt(balance);
-          
-          // Hitung Total Hewan                           
-          const totalQty = animalsData.reduce((s, a) => s + (Number(a.qty) || Number(a.jumlah) || 1), 0);
-          document.getElementById("stat-total").textContent = totalQty;
-          document.getElementById("stat-slots").textContent = totalQty + "/8";
+    /* ── Button loading state ── */
+    function setButtonLoading(btn, loading, originalText) {
+      if (!btn) return;
+      if (loading) {
+        btn.dataset.originalText = btn.innerHTML;
+        btn.innerHTML = '⏳ Proses...';
+        btn.disabled = true;
+        btn.classList.add('loading');
+      } else {
+        btn.innerHTML = btn.dataset.originalText || originalText || btn.innerHTML;
+        btn.disabled = false;
+        btn.classList.remove('loading');
+      }
+    }
 
-          // Hitung Siap Jual 
-          const readyCount = animalsData
-            .filter((a) => Date.now() >= (a.readyAt || 0))
-            .reduce((s, a) => s + (Number(a.qty) || Number(a.jumlah) || 1), 0);
-          document.getElementById("stat-ready").textContent = readyCount;
+    /* ── Load data dari server ── */
+    async function load() {
+      if (isLoading) {
+        log('warn', 'load() dipanggil saat masih loading, skip.');
+        return;
+      }
+      isLoading = true;
+      log('info', 'Mengambil data ternak dari server...');
 
-          // Hitung Profit
-          const estProfit = animalsData.reduce((s, a) => {
-            
-            const animalKey = a.animal || a.type || a.jenis || a.id; 
-            const ad = ANIMALS[animalKey];
-            const q = Number(a.qty) || Number(a.jumlah) || 1;
-            return s + (ad ? (ad.jual - ad.beli) * q : 0);
-          }, 0);
-          document.getElementById("stat-profit").textContent = "Rp" + fmt(estProfit);
+      try {
+        const r = await api.get('/features/ternak');
+        log('api', 'GET /features/ternak response:', r);
 
-          renderKandang();
-          renderShop();
-          renderPanduan();
-        } catch (e) {
-          console.error(e);
-          showToast("error", "Gagal memuat data ternak");
+        if (!r || typeof r !== 'object') {
+          throw new Error('Response tidak valid: ' + JSON.stringify(r));
         }
+
+        status = { animals: r.animals || [], balance: r.balance || 0 };
+        hideGlobalError();
+
+        // Update stats
+        const animals = status.animals;
+        const balance = status.balance;
+        const totalQty = animals.reduce((s, a) => s + getQty(a), 0);
+        const readyCount = animals.filter(a => Date.now() >= (a.readyAt || 0))
+                                  .reduce((s, a) => s + getQty(a), 0);
+        const estProfit = animals.reduce((s, a) => {
+          const ad = ANIMALS[getAnimalKey(a)];
+          return s + (ad ? (ad.jual - ad.beli) * getQty(a) : 0);
+        }, 0);
+
+        document.getElementById('top-balance').textContent = 'Rp' + fmt(balance);
+        document.getElementById('stat-balance').textContent = 'Rp' + fmt(balance);
+        document.getElementById('stat-total').textContent = totalQty;
+        document.getElementById('stat-slots').textContent = totalQty + '/' + MAX_SLOTS;
+        document.getElementById('stat-ready').textContent = readyCount;
+        document.getElementById('stat-profit').textContent = 'Rp' + fmt(estProfit);
+
+        renderKandang();
+        renderShop();
+        renderPanduan();
+
+        log('info', `Data loaded — ${totalQty} hewan, ${readyCount} siap jual, saldo Rp${fmt(balance)}`);
+      } catch (e) {
+        log('error', 'Gagal load data ternak:', e.message || e);
+        showGlobalError('Gagal memuat data ternak: ' + (e.message || 'Network error'));
+        showToast('error', 'Gagal memuat data ternak');
+      } finally {
+        isLoading = false;
+      }
+    }
+
+    /* ── Helper: ambil key & qty animal ── */
+    function getAnimalKey(a) {
+      return a.animal || a.type || a.jenis || a.id || '';
+    }
+    function getQty(a) {
+      return parseInt(a.qty) || parseInt(a.jumlah) || 1;
+    }
+
+    /* ── Render Kandang ── */
+    function renderKandang() {
+      const el = document.getElementById('kandang-list');
+      const animals = status.animals || [];
+
+      // Bersihkan semua interval lama
+      Object.keys(timers).forEach(k => { clearInterval(timers[k]); delete timers[k]; });
+
+      if (!animals.length) {
+        el.innerHTML = '<div class="alert alert-info">Kandang kosong. Beli hewan dulu di tab 🏪 Beli Hewan!</div>';
+        return;
       }
 
-      function renderKandang() {
-        const el = document.getElementById("kandang-list");
-        const animals = status.animals || [];
-        
-        if (!animals.length) {
-          el.innerHTML = '<div class="alert alert-info">Kandang kosong. Beli hewan dulu!</div>';
-          return;
+      el.innerHTML = animals.map((a, i) => {
+        const key = getAnimalKey(a);
+        const q   = getQty(a);
+        const ad  = ANIMALS[key] || { icon: '❓', name: 'Hewan Misterius (' + key + ')', beli: 0, jual: 0, label: '-' };
+        const readyAt = Number(a.readyAt) || 0;
+        const left = readyAt - Date.now();
+        const ready = left <= 0;
+        const profit = (ad.jual - ad.beli) * q;
+
+        if (!ANIMALS[key]) {
+          log('warn', `Animal key tidak dikenal di kandang: "${key}"`, a);
         }
 
-        el.innerHTML = animals
-          .map((a, i) => {
-        
-            const animalKey = a.animal || a.type || a.jenis || a.id || "Tidak Diketahui";
-            const q = Number(a.qty) || Number(a.jumlah) || 1; 
-            const readyTimestamp = Number(a.readyAt) || Date.now(); // Hindari NaN
-            
-            const ad = ANIMALS[animalKey] || { icon: "❓", name: "Hewan Misterius", beli: 0, jual: 0, label: "" };
-            
-            const left = readyTimestamp - Date.now();
-            const ready = left <= 0;
-            const profit = (ad.jual - ad.beli) * q;
+        return `
+          <div class="hewan-item" id="hewan-row-${i}">
+            <div style="display:flex;align-items:center;gap:14px">
+              <span style="font-size:36px">${ad.icon}</span>
+              <div>
+                <div style="font-weight:700;font-size:15px">${ad.name} × ${q}</div>
+                <div class="${ready ? 'timer-ready' : 'timer-wait'}" id="timer-a-${i}">
+                  ${ready ? '✅ SIAP JUAL!' : '⏳ ' + fmtTime(left)}
+                </div>
+                <span class="profit-badge">Est. Profit: +Rp${fmt(profit)}</span>
+              </div>
+            </div>
+            <div>
+              ${ready
+                ? `<button class="btn btn-primary btn-sm" id="btn-jual-${i}" onclick="jualSatu(this, ${i})">💰 Jual</button>`
+                : `<span style="font-size:12px;color:var(--text-secondary)">${ad.label}</span>`}
+            </div>
+          </div>`;
+      }).join('');
 
-            return `
-    <div class="hewan-item">
-      <div style="display:flex;align-items:center;gap:14px">
-        <span style="font-size:36px">${ad.icon}</span>
-        <div>
-          <div style="font-weight:700;font-size:15px">${ad.name} × ${q}</div>
-          <div class="${ready ? "timer-ready" : "timer-wait"}" id="timer-a-${i}">
-            ${ready ? "✅ SIAP JUAL!" : "⏳ " + fmtTime(left)}
+      // Pasang countdown timer per item
+      animals.forEach((a, i) => {
+        const readyAt = Number(a.readyAt) || 0;
+        if (readyAt > Date.now()) {
+          timers['a-' + i] = setInterval(() => {
+            const timerEl = document.getElementById(`timer-a-${i}`);
+            const rowEl   = document.getElementById(`hewan-row-${i}`);
+            if (!timerEl) { clearInterval(timers['a-' + i]); return; }
+
+            const left2 = readyAt - Date.now();
+            if (left2 <= 0) {
+              clearInterval(timers['a-' + i]);
+              timerEl.textContent = '✅ SIAP JUAL!';
+              timerEl.className = 'timer-ready';
+              // Tambahkan tombol jual jika belum ada
+              const btnArea = rowEl?.querySelector('div:last-child');
+              if (btnArea && !btnArea.querySelector('button')) {
+                btnArea.innerHTML = `<button class="btn btn-primary btn-sm" id="btn-jual-${i}" onclick="jualSatu(this, ${i})">💰 Jual</button>`;
+              }
+              // Update stat ready
+              const readyEl = document.getElementById('stat-ready');
+              readyEl.textContent = parseInt(readyEl.textContent || '0') + getQty(a);
+              log('info', `Hewan index ${i} (${getAnimalKey(a)}) sudah siap jual!`);
+            } else {
+              timerEl.textContent = '⏳ ' + fmtTime(left2);
+            }
+          }, 1000);
+        }
+      });
+    }
+
+    /* ── Render Shop ── */
+    function renderShop() {
+      const el = document.getElementById('animal-shop-grid');
+      const animals = status.animals || [];
+      const slotCount = animals.reduce((s, a) => s + getQty(a), 0);
+      const slotsLeft = MAX_SLOTS - slotCount;
+      const penuh = slotCount >= MAX_SLOTS;
+
+      el.innerHTML = Object.entries(ANIMALS).map(([key, a]) => `
+        <div class="animal-card">
+          <div class="animal-icon">${a.icon}</div>
+          <div style="font-weight:700;font-size:16px;margin-bottom:6px">${a.name}</div>
+          <div style="font-size:12px;color:var(--text-secondary);line-height:1.8;margin-bottom:12px">
+            💰 Beli: <b>Rp${fmt(a.beli)}</b><br>
+            💵 Jual: <b>Rp${fmt(a.jual)}</b><br>
+            📈 Profit: <b style="color:var(--accent-green)">+Rp${fmt(a.jual - a.beli)}</b><br>
+            ⏱️ Waktu: <b>${a.label}</b>
           </div>
-          <span class="profit-badge">Est. Profit: +Rp${fmt(profit)}</span>
-        </div>
-      </div>
-      ${ready ? `<button class="btn btn-primary btn-sm" onclick="jual()">💰 Jual</button>` : `<span style="font-size:12px;color:var(--text-secondary)">${ad.label}</span>`}
-    </div>`;
-          })
-          .join("");
+          <div class="qty-row">
+            <span style="font-size:12px">Qty:</span>
+            <input type="number" class="qty-input" id="qty-${key}"
+              min="1" max="${Math.max(1, slotsLeft)}" value="1"
+              ${penuh ? 'disabled' : ''}
+              oninput="clampQty(this, ${slotsLeft})">
+          </div>
+          ${penuh
+            ? `<div class="alert alert-info" style="margin:0;padding:8px 12px;font-size:12px">
+                 📦 Kandang penuh (${slotCount}/${MAX_SLOTS})
+               </div>`
+            : `<button class="btn btn-primary btn-block btn-sm"
+                 id="btn-beli-${key}"
+                 onclick="beli('${key}', this)">
+                 🐄 Beli
+               </button>`}
+        </div>`
+      ).join('');
+    }
 
-        // Reset timer lama
-        Object.keys(timers).forEach(k => clearInterval(timers[k]));
+    /* ── Clamp qty input agar tidak melebihi slot tersedia ── */
+    function clampQty(input, maxSlots) {
+      const v = parseInt(input.value);
+      if (isNaN(v) || v < 1) input.value = 1;
+      else if (v > maxSlots) { input.value = maxSlots; }
+    }
 
-        // Buat timer baru
-        animals.forEach((a, i) => {
-          const readyTimestamp = Number(a.readyAt) || Date.now();
-          if (readyTimestamp > Date.now()) {
-            timers["a-" + i] = setInterval(() => {
-              const el2 = document.getElementById(`timer-a-${i}`);
-              if (!el2) {
-                clearInterval(timers["a-" + i]);
-                return;
-              }
-              const left2 = readyTimestamp - Date.now();
-              if (left2 <= 0) {
-                el2.textContent = "✅ SIAP JUAL!";
-                el2.className = "timer-ready";
-                clearInterval(timers["a-" + i]);
-              } else {
-                el2.textContent = "⏳ " + fmtTime(left2);
-              }
-            }, 1000); // Update setiap 1 detik agar lebih mulus
-          }
-        });
-      }
+    /* ── Render Panduan ── */
+    function renderPanduan() {
+      const el = document.getElementById('profit-table');
+      el.innerHTML = Object.entries(ANIMALS).map(([k, a]) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;
+             padding:8px 14px;background:var(--hover-bg);border-radius:8px;margin-bottom:6px">
+          <span>${a.icon} ${a.name}</span>
+          <span style="font-size:12px;color:var(--text-secondary)">${a.label}</span>
+          <span style="font-weight:700;color:var(--accent-green)">+Rp${fmt(a.jual - a.beli)}</span>
+        </div>`
+      ).join('');
+    }
 
-      function renderShop() {
-        const el = document.getElementById("animal-shop-grid");
+    /* ============================================================
+       AKSI: BELI
+    ============================================================ */
+    async function beli(animalKey, btn) {
+      const qtyInput = document.getElementById(`qty-${animalKey}`);
+      const qty = parseInt(qtyInput?.value) || 1;
+
+      log('info', `[BELI] Memulai pembelian ${qty}x ${animalKey}`);
+      setButtonLoading(btn, true);
+
+      try {
+        // Validasi slot — dilakukan di frontend sebagai quick-check sebelum hit server
         const animals = status.animals || [];
-        const slotCount = animals.reduce((s, a) => s + (Number(a.qty) || Number(a.jumlah) || 1), 0);
-        const maxSlots = 8;
-        
-        
-        let htmlContent = "";
-        Object.entries(ANIMALS).forEach(([key, a]) => {
-             const html = `
-    <div class="animal-card">
-      <div class="animal-icon">${a.icon}</div>
-      <div style="font-weight:700;font-size:16px;margin-bottom:6px">${a.name}</div>
-      <div style="font-size:12px;color:var(--text-secondary);line-height:1.8;margin-bottom:12px">
-        💰 Beli: <b>Rp${fmt(a.beli)}</b><br>
-        💵 Jual: <b>Rp${fmt(a.jual)}</b><br>
-        📈 Profit: <b style="color:var(--accent-green)">+Rp${fmt(a.jual - a.beli)}</b><br>
-        ⏱️ Waktu: <b>${a.label}</b>
-      </div>
-      <div class="qty-row">
-        <span style="font-size:12px">Qty:</span>
-        <input type="number" class="qty-input" id="qty-${key}" min="1" value="1" max="${Math.max(1, maxSlots - slotCount)}">
-      </div>
-      ${slotCount >= maxSlots ? `<div class="alert alert-info" style="margin:0;padding:8px 12px;font-size:12px">📦 Kandang penuh (${slotCount}/8)</div>` : `<button class="btn btn-primary btn-block btn-sm" onclick="beli('${key}')">🐄 Beli</button>`}
-    </div>
-  `;
-            htmlContent += html;
-        });
-        
-        el.innerHTML = htmlContent;
+        const slotCount = animals.reduce((s, a) => s + getQty(a), 0);
+        if (slotCount + qty > MAX_SLOTS) {
+          const msg = `Slot tidak cukup! Tersisa ${MAX_SLOTS - slotCount} slot, kamu mau beli ${qty}.`;
+          log('warn', '[BELI] ' + msg);
+          showToast('error', '❌ ' + msg);
+          return; // finally tetap jalan → button di-restore
+        }
+
+        const ad = ANIMALS[animalKey];
+        if (!ad) throw new Error('Hewan tidak dikenal: ' + animalKey);
+
+        // Validasi saldo
+        const total = ad.beli * qty;
+        if ((status.balance || 0) < total) {
+          const msg = `Saldo kurang! Butuh Rp${fmt(total)}, saldo kamu Rp${fmt(status.balance)}.`;
+          log('warn', '[BELI] ' + msg);
+          showToast('error', '❌ ' + msg);
+          return; // finally tetap jalan → button di-restore
+        }
+
+        const r = await api.post('/features/ternak/beli', { animal: animalKey, qty });
+        log('api', '[BELI] Response:', r);
+
+        if (r && r.success === false) {
+          throw new Error(r.message || 'Beli gagal dari server');
+        }
+
+        showToast('success', r?.message || `✅ Beli ${qty}x ${animalKey} berhasil!`);
+        await load();
+      } catch (e) {
+        log('error', '[BELI] Gagal:', e.message || e);
+        showToast('error', e.message || 'Gagal membeli hewan');
+        showGlobalError('Beli gagal: ' + (e.message || 'Cek koneksi / saldo kamu'));
+      } finally {
+        // Selalu restore button — termasuk saat early return validasi gagal
+        setButtonLoading(btn, false);
+      }
+    }
+
+    /* ============================================================
+       AKSI: BERI PAKAN
+    ============================================================ */
+    async function beriPakan(btn) {
+      const animals = status.animals || [];
+      if (!animals.length) {
+        showToast('error', '❌ Tidak ada hewan di kandang!');
+        log('warn', '[PAKAN] Kandang kosong, skip.');
+        return;
       }
 
-      function renderPanduan() {
-        const el = document.getElementById("profit-table");
-        let htmlContent = "";
-        Object.entries(ANIMALS).forEach(([k, a]) => {
-            htmlContent += `
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;background:var(--hover-bg);border-radius:8px;margin-bottom:6px">
-      <span>${a.icon} ${a.name}</span>
-      <span style="font-size:12px;color:var(--text-secondary)">${a.label}</span>
-      <span style="font-weight:700;color:var(--accent-green)">+Rp${fmt(a.jual - a.beli)}</span>
-    </div>`;
-        });
-        el.innerHTML = htmlContent;
+      log('info', '[PAKAN] Memberi pakan ke semua hewan...');
+      setButtonLoading(btn, true);
+
+      try {
+        const r = await api.post('/features/ternak/pakan', {});
+        log('api', '[PAKAN] Response:', r);
+
+        if (r && r.success === false) {
+          throw new Error(r.message || 'Gagal beri pakan dari server');
+        }
+
+        showToast('success', r?.message || '🍖 Pakan diberikan! Waktu dipercepat 1 jam.');
+        await load();
+      } catch (e) {
+        log('error', '[PAKAN] Gagal:', e.message || e);
+        showToast('error', e.message || 'Gagal memberi pakan');
+        showGlobalError('Beri pakan gagal: ' + (e.message || 'Cek koneksi'));
+      } finally {
+        setButtonLoading(btn, false);
+      }
+    }
+
+    /* ============================================================
+       AKSI: JUAL (semua yang siap — dari header button)
+    ============================================================ */
+    async function jualSemua(btn) {
+      const animals = status.animals || [];
+      const readyAnimals = animals.filter(a => Date.now() >= (Number(a.readyAt) || 0));
+
+      if (!readyAnimals.length) {
+        showToast('error', '⏳ Belum ada hewan yang siap dijual!');
+        log('warn', '[JUAL SEMUA] Tidak ada hewan yang siap.');
+        return;
       }
 
+      log('info', `[JUAL SEMUA] ${readyAnimals.length} batch hewan siap jual, memulai...`);
+      setButtonLoading(btn, true);
 
-      async function beli(animal) { /* ... */ }
-      async function beriPakan() { /* ... */ }
-      async function jual() { /* ... */ }
-      async function jualSemua() { await jual(); }
+      try {
+        const r = await api.post('/features/ternak/jual', {});
+        log('api', '[JUAL SEMUA] Response:', r);
 
-      function switchTab(tab) {
-        ["kandang", "pasar-hewan", "panduan"].forEach((t) => {
-          document
-            .getElementById(`tab-${t}`)
-            .classList.toggle("hidden", t !== tab);
-        });
-        document.querySelectorAll(".tab").forEach((el, i) => {
-          el.classList.toggle(
-            "active",
-            ["kandang", "pasar-hewan", "panduan"][i] === tab,
-          );
-        });
+        if (r && r.success === false) {
+          throw new Error(r.message || 'Jual gagal dari server');
+        }
+
+        showToast('success', r?.message || `🤑 Penjualan berhasil! +Rp${fmt(r?.income || 0)}`);
+        await load();
+      } catch (e) {
+        log('error', '[JUAL SEMUA] Gagal:', e.message || e);
+        showToast('error', e.message || 'Gagal menjual ternak');
+        showGlobalError('Jual gagal: ' + (e.message || 'Cek koneksi'));
+      } finally {
+        setButtonLoading(btn, false);
+      }
+    }
+
+    /* ============================================================
+       AKSI: JUAL SATU (dari tombol per-item di kandang)
+       — Memanggil endpoint yang sama (jual semua yang ready)
+    ============================================================ */
+    async function jualSatu(btn, index) {
+      const a = (status.animals || [])[index];
+      if (!a) {
+        log('error', `[JUAL] Hewan index ${index} tidak ditemukan di status!`);
+        showToast('error', 'Hewan tidak ditemukan, coba refresh');
+        return; // tidak ada setButtonLoading sebelumnya, jadi tidak perlu restore
       }
 
-      
-      if (typeof showToast !== 'function') {
-         window.showToast = function(type, msg) { alert(type.toUpperCase() + ": " + msg); };
-      }
+      const key = getAnimalKey(a);
+      log('info', `[JUAL] Menjual hewan index ${index} (${key}) qty ${getQty(a)}...`);
+      setButtonLoading(btn, true);
 
-      // Init
-      const ME = typeof getUser === 'function' ? getUser() : { username: "Tamu", role: "user" };
-      if (ME && ME.username !== "Tamu") {
-        document.getElementById("sidebar-username").textContent = ME.username;
-        document.getElementById("sidebar-avatar").textContent = ME.username[0].toUpperCase();
-        document.getElementById("sidebar-role").textContent = ME.role || "user";
-        if (ME.role === "admin" || ME.role === "developer")
-          document.querySelectorAll(".admin-only").forEach((el) => el.classList.remove("hidden"));
+      try {
+        const r = await api.post('/features/ternak/jual', {});
+        log('api', '[JUAL] Response:', r);
+
+        if (r && r.success === false) {
+          throw new Error(r.message || 'Jual gagal dari server');
+        }
+
+        showToast('success', r?.message || `🤑 Ternak terjual! +Rp${fmt(r?.income || 0)}`);
+        await load(); // load() akan re-render kandang → button lama hilang otomatis
+      } catch (e) {
+        log('error', `[JUAL] Gagal jual index ${index}:`, e.message || e);
+        showToast('error', e.message || 'Gagal menjual ternak');
+        showGlobalError('Jual gagal: ' + (e.message || 'Cek koneksi'));
+      } finally {
+        // Restore button — penting kalau load() gagal dan button masih ada di DOM
+        setButtonLoading(btn, false);
       }
+    }
+
+    /* ── Tab switcher ── */
+    function switchTab(tab) {
+      ['kandang', 'pasar-hewan', 'panduan'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tab);
+      });
+      document.querySelectorAll('.tab').forEach((el, i) => {
+        el.classList.toggle('active', ['kandang', 'pasar-hewan', 'panduan'][i] === tab);
+      });
+      log('info', `[TAB] Pindah ke tab: ${tab}`);
+    }
+
+    /* ── Toast fallback jika api.js belum load ── */
+    if (typeof showToast !== 'function') {
+      window.showToast = function(type, msg) {
+        console[type === 'error' ? 'error' : 'log']('[TOAST]', msg);
+        alert((type === 'error' ? '❌ ' : '✅ ') + msg);
+      };
+    }
+
+    /* ── Sidebar user info ── */
+    try {
+      const ME = typeof getUser === 'function' ? getUser() : null;
+      if (ME && ME.username) {
+        document.getElementById('sidebar-username').textContent = ME.username;
+        document.getElementById('sidebar-avatar').textContent = ME.username[0].toUpperCase();
+        document.getElementById('sidebar-role').textContent = ME.role || 'user';
+        if (ME.role === 'admin' || ME.role === 'developer') {
+          document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+        }
+        log('info', `[AUTH] Login sebagai: ${ME.username} (${ME.role})`);
+      } else {
+        log('warn', '[AUTH] Tidak ada data user, getUser() tidak tersedia atau return null');
+      }
+    } catch (authErr) {
+      log('error', '[AUTH] Error mengambil user:', authErr.message);
+    }
+
+    /* ── Init ── */
+    log('info', '[INIT] Halaman ternak dimuat, memulai load()...');
+    load();
+    // Auto-refresh setiap 30 detik
+    setInterval(() => {
+      log('info', '[AUTO-REFRESH] Memuat ulang data ternak...');
       load();
-      setInterval(load, 30000);
+    }, 30000);
     </script>
   </body>
 </html>
