@@ -21,6 +21,7 @@ const IS_VERCEL = !!process.env.VERCEL;
 
 const app = express();
 
+app.set('trust proxy', 1);
 // ── 1. Security Middleware ────────────────────────────────────
 app.use(
   helmet({
