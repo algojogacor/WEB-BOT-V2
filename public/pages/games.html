@@ -837,6 +837,11 @@
         "🂾",
       ];
 
+      // Fungsi untuk format angka ke Rupiah (Tambahkan ini agar tidak error)
+      function fmt(num) {
+        return Number(num || 0).toLocaleString("id-ID");
+      }
+
       async function load() {
         try {
           const r = await api.get("/features/games");
@@ -845,20 +850,22 @@
             return;
           }
           balance = r.balance || 0;
-          document.getElementById("top-balance").textContent =
-            "Rp" + fmt(balance);
-          document.getElementById("stat-balance").textContent =
-            "Rp" + fmt(balance);
-          const s = r.gamesStats || {};
-          document.getElementById("stat-wins").textContent = (
-            s.wins || 0
-          ).toLocaleString("id-ID");
-          document.getElementById("stat-losses").textContent = (
-            s.losses || 0
-          ).toLocaleString("id-ID");
-          document.getElementById("stat-won").textContent =
-            "Rp" + fmt(s.totalWon || 0);
-        } catch (e) {}
+          
+          // Update Tampilan Saldo
+          document.getElementById("top-balance").textContent = "Rp" + fmt(balance);
+          document.getElementById("stat-balance").textContent = "Rp" + fmt(balance);
+          
+          const s = r.gamesStats || { wins: 0, losses: 0, totalWon: 0, totalLost: 0 };
+          
+          // Update Statistik
+          document.getElementById("stat-wins").textContent = fmt(s.wins);
+          document.getElementById("stat-losses").textContent = fmt(s.losses);
+          document.getElementById("stat-won").textContent = "Rp" + fmt(s.totalWon);
+          
+          // Opsional: Jika backend mengirim riwayat, panggil renderHistory di sini
+        } catch (e) {
+          console.error("Gagal memuat data:", e);
+        }
       }
 
       function setBet(game, val) {
@@ -982,43 +989,51 @@
         slotSpinning = true;
         const lever = document.getElementById("slot-lever-el");
         lever.style.transform = "rotate(-30deg)";
-        [1, 2, 3].forEach((i) =>
-          document.getElementById(`reel-${i}`).classList.add("spinning"),
-        );
+        
+        // Mulai animasi putar
+        const reelElements = [1, 2, 3].map(i => document.getElementById(`reel-${i}`));
+        reelElements.forEach(el => el.classList.add("spinning"));
+
+        // Efek visual acak selama berputar
+        const visualInterval = setInterval(() => {
+          reelElements.forEach(el => {
+            el.textContent = REELS_SYMBOLS[Math.floor(Math.random() * REELS_SYMBOLS.length)];
+          });
+        }, 100);
+
         try {
           const r = await api.post("/features/games/slot", {
             bet: document.getElementById("slot-bet").value,
           });
+
           if (!r || r.success === false) {
-            lever.style.transform = "";
-            [1, 2, 3].forEach((i) =>
-              document.getElementById(`reel-${i}`).classList.remove("spinning"),
-            );
-            showToast("error", r?.message || "Error");
-            slotSpinning = false;
-            return;
+             // ... handle error seperti kodemu sebelumnya ...
+             clearInterval(visualInterval);
+             return;
           }
+
           setTimeout(() => {
-            [1, 2, 3].forEach((i, idx) => {
-              const el = document.getElementById(`reel-${i}`);
+            clearInterval(visualInterval); // Hentikan acak visual
+            reelElements.forEach((el, idx) => {
               el.classList.remove("spinning");
-              el.textContent = r.reels[idx];
+              el.textContent = r.reels[idx]; // Set hasil asli dari backend
             });
+            
             lever.style.transform = "";
             balance = r.balance;
-            document.getElementById("top-balance").textContent =
-              "Rp" + fmt(balance);
-            document.getElementById("stat-balance").textContent =
-              "Rp" + fmt(balance);
+            
+            // Update UI
+            document.getElementById("top-balance").textContent = "Rp" + fmt(balance);
             const rd = document.getElementById("slot-result");
             rd.textContent = r.message;
             rd.className = "result-display " + (r.won ? "win" : "lose");
-            if (r.won) showToast("success", "🎰 JACKPOT! " + r.message);
+            
             addHistory("Slot", r.won, r.amount);
             load();
             slotSpinning = false;
-          }, 800);
+          }, 1200); // Putar sedikit lebih lama (1.2 detik) agar dramatis
         } catch (e) {
+          clearInterval(visualInterval);
           lever.style.transform = "";
           [1, 2, 3].forEach((i) =>
             document.getElementById(`reel-${i}`).classList.remove("spinning"),

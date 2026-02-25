@@ -264,11 +264,41 @@ async function dadu(req, res) {
 async function minigameReward(req, res) {
     const { username } = req.user;
     const { source, data: u } = getUserGameData(username);
+    
+    // 1. SISTEM ANTI-SPAM (Cooldown 2 Menit)
+    const now = Date.now();
+    const lastRewardTime = u.lastMinigameReward || 0;
+    const cooldownMs = 2 * 60 * 1000; // Jeda 2 menit
+    
+    if (now - lastRewardTime < cooldownMs) {
+        const leftSec = Math.ceil((cooldownMs - (now - lastRewardTime)) / 1000);
+        return res.status(400).json({ 
+            success: false, 
+            message: `⏳ Terlalu cepat! Tunggu ${leftSec} detik sebelum main mini-game lagi.` 
+        });
+    }
+
+    // 2. Batasi Hadiah Maksimal (Misal max Rp 50.000 sekali main)
     const amount = Math.floor(Number(req.body.amount) || 0);
-    if (amount <= 0 || amount > 100_000_000) return res.status(400).json({ success: false, message: '❌ Jumlah reward tidak valid (max Rp100jt).' });
+    const MAX_REWARD = 50000; 
+
+    if (amount <= 0 || amount > MAX_REWARD) {
+        return res.status(400).json({ 
+            success: false, 
+            message: `❌ Hadiah tidak valid. Maksimal reward mini-game adalah Rp${fmt(MAX_REWARD)}.` 
+        });
+    }
+
+    // 3. Simpan data dan update waktu terakhir main
     u.balance = (u.balance || 0) + amount;
+    u.lastMinigameReward = now; 
     await saveU(username, u, source);
-    return res.json({ success: true, balance: u.balance, message: `🎁 Reward +Rp${fmt(amount)}` });
+    
+    return res.json({ 
+        success: true, 
+        balance: u.balance, 
+        message: `🎁 Reward Minigame +Rp${fmt(amount)}` 
+    });
 }
 
 module.exports = { getStatus, casino, roulette, slot, coinflip, dadu, minigameReward };

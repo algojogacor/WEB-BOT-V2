@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlgojoGacor — AI Chat</title>
+    <title>AlgojoGacor — AI Chat & Image</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/dashboard.css">
     <style>
-        .ai-chat-area { display: flex; flex-direction: column; gap: 12px; max-height: 55vh; overflow-y: auto; padding: 16px; background: var(--bg-secondary); border-radius: var(--radius); margin-bottom: 12px; }
-        .ai-msg { padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.6; max-width: 80%; }
-        .ai-msg.user   { background: var(--accent); color: #fff; align-self: flex-end; }
-        .ai-msg.bot    { background: var(--bg-card); border: 1px solid var(--border); }
-        .ai-msg.loading{ color: var(--text-muted); font-style: italic; }
+        .ai-chat-area { 
+            display: flex; flex-direction: column; gap: 12px; 
+            height: 55vh; overflow-y: auto; padding: 16px; 
+            background: var(--bg-secondary); border-radius: var(--radius); margin-bottom: 12px; 
+        }
+        .ai-msg { padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.6; max-width: 85%; word-wrap: break-word; }
+        .ai-msg.user   { background: var(--accent); color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .ai-msg.bot    { background: var(--bg-card); border: 1px solid var(--border); align-self: flex-start; border-bottom-left-radius: 2px; }
+        .ai-msg.loading{ color: var(--text-muted); font-style: italic; align-self: flex-start; }
     </style>
 </head>
 <body>
@@ -29,40 +33,57 @@
             </div>
         </aside>
         <div class="main-content">
-            <header class="topbar"><div style="display:flex;align-items:center;gap:12px"><button class="hamburger" onclick="toggleSidebar()">☰</button><span class="topbar-title">🤖 AI Chat</span></div></header>
+            <header class="topbar">
+                <div style="display:flex;align-items:center;gap:12px">
+                    <button class="hamburger" onclick="toggleSidebar()">☰</button>
+                    <span class="topbar-title">🤖 AI Assistant</span>
+                </div>
+            </header>
             <main class="content-area">
                 <div class="card">
-                    <div class="card-header"><span class="icon">🤖</span><h3>AlgojoGacor AI</h3><span style="font-size:12px;color:var(--text-muted);margin-left:auto">Powered by OpenRouter</span></div>
+                    <div class="card-header">
+                        <span class="icon">🤖</span>
+                        <h3>AlgojoGacor AI</h3>
+                        <span style="font-size:12px;color:var(--text-muted);margin-left:auto">Powered by OpenRouter & Pollinations</span>
+                    </div>
                     <div class="form-group">
-                        <label>Model AI</label>
+                        <label>Pilih Model AI (Hanya untuk Chat)</label>
                         <select class="form-input" id="ai-model">
-                            <option value="openai/gpt-4o-mini">GPT-4o Mini (Cepat & Hemat)</option>
-                            <option value="openai/gpt-4o">GPT-4o (Paling Pintar)</option>
-                            <option value="anthropic/claude-3-haiku">Claude 3 Haiku (Cepat)</option>
-                            <option value="meta-llama/llama-3.1-8b-instruct:free">Llama 3.1 8B (Gratis)</option>
+                            <option value="openai/gpt-4o-mini">GPT-4o Mini (Cepat & Pintar)</option>
+                            <option value="openai/gpt-4o">GPT-4o (Paling Jenius)</option>
+                            <option value="anthropic/claude-3-haiku">Claude 3 Haiku (Puitis & Cepat)</option>
+                            <option value="meta-llama/llama-3.1-8b-instruct:free">Llama 3.1 8B (Ringan)</option>
                         </select>
                     </div>
+                    
                     <div class="ai-chat-area" id="ai-chat-area">
-                        <div class="ai-msg bot">👋 Halo! Saya AlgojoGacor AI. Tanyakan apa saja!</div>
+                        <div class="ai-msg bot">👋 Halo! Saya AlgojoGacor AI.<br><br>💡 <b>Tips:</b><br>- Chat biasa dikenakan biaya Rp50.000<br>- Bikin gambar dikenakan biaya Rp150.000</div>
                     </div>
-                    <div style="display:flex;gap:8px">
-                        <input type="text" class="form-input" id="ai-input" placeholder="Ketik pertanyaan..." onkeydown="if(event.key==='Enter') sendAI()">
-                        <button class="btn btn-primary" onclick="sendAI()">➤ Kirim</button>
+                    
+                    <div style="display:flex;gap:8px; align-items: stretch; flex-wrap: wrap;">
+                        <input type="text" class="form-input" id="ai-input" style="flex: 1; min-width: 200px;" placeholder="Ketik pertanyaan atau deskripsi gambar..." onkeydown="if(event.key==='Enter') sendAI()">
+                        <button class="btn btn-primary" onclick="sendAI()">💬 Chat (Rp50k)</button>
+                        <button class="btn btn-success" style="color: black;" onclick="sendImagine()">🎨 Gambar (Rp150k)</button>
                     </div>
                 </div>
             </main>
         </div>
     </div>
+    
     <div id="toast-container"></div>
     <script src="/js/api.js"></script>
     <script>
-        if (!requireLogin()) throw new Error();
-        const ME = getUser();
+        if (typeof requireLogin === 'function' && !requireLogin()) throw new Error();
+        const ME = typeof getUser === 'function' ? getUser() : { username: "Tamu" };
+        
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('sidebar-username').textContent = ME.username;
-            document.getElementById('sidebar-avatar').textContent   = ME.username[0].toUpperCase();
+            if (ME.username !== "Tamu") {
+                document.getElementById('sidebar-username').textContent = ME.username;
+                document.getElementById('sidebar-avatar').textContent   = ME.username[0].toUpperCase();
+            }
         });
 
+        // Fitur Chat Teks Biasa
         async function sendAI() {
             const input  = document.getElementById('ai-input');
             const model  = document.getElementById('ai-model').value;
@@ -72,21 +93,59 @@
 
             const area = document.getElementById('ai-chat-area');
             area.innerHTML += `<div class="ai-msg user">${escHtml(msg)}</div>`;
-            area.innerHTML += `<div class="ai-msg loading" id="ai-loading">🤔 Memproses...</div>`;
+            area.innerHTML += `<div class="ai-msg loading" id="ai-loading">🤔 Memproses chat...</div>`;
             area.scrollTop = area.scrollHeight;
 
-            const res = await api.post('/features/ai/chat', { message: msg, model });
-
-            document.getElementById('ai-loading')?.remove();
-            if (res?.success) {
-                area.innerHTML += `<div class="ai-msg bot">${escHtml(res.reply).replace(/\n/g,'<br>')}</div>`;
-            } else {
-                area.innerHTML += `<div class="ai-msg bot" style="color:var(--accent)">❌ ${escHtml(res?.message || 'Error')}</div>`;
+            try {
+                const res = await api.post('/features/ai/chat', { message: msg, model });
+                document.getElementById('ai-loading')?.remove();
+                
+                if (res?.success) {
+                    area.innerHTML += `<div class="ai-msg bot">${escHtml(res.reply).replace(/\n/g,'<br>')}</div>`;
+                } else {
+                    area.innerHTML += `<div class="ai-msg bot" style="color:var(--accent)">❌ ${escHtml(res?.message || 'Error')}</div>`;
+                }
+            } catch (err) {
+                document.getElementById('ai-loading')?.remove();
+                area.innerHTML += `<div class="ai-msg bot" style="color:var(--accent)">❌ Gagal terhubung ke server.</div>`;
             }
             area.scrollTop = area.scrollHeight;
         }
 
-        function escHtml(s) { return String(s||'').replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#x27;'}[c])); }
+        // Fitur Generate Gambar
+        async function sendImagine() {
+            const input  = document.getElementById('ai-input');
+            const msg    = input.value.trim();
+            if (!msg) return;
+            input.value  = '';
+
+            const area = document.getElementById('ai-chat-area');
+            area.innerHTML += `<div class="ai-msg user">🎨 Gambarkan: ${escHtml(msg)}</div>`;
+            area.innerHTML += `<div class="ai-msg loading" id="ai-loading">🖌️ Sedang melukis gambar...</div>`;
+            area.scrollTop = area.scrollHeight;
+
+            try {
+                const res = await api.post('/features/ai/imagine', { prompt: msg });
+                document.getElementById('ai-loading')?.remove();
+                
+                if (res?.success) {
+                    // JANGAN gunakan escHtml di sini karena backend mengirimkan tag <img src="...">
+                    // Kita hanya me-replace enter menjadi <br>
+                    area.innerHTML += `<div class="ai-msg bot">${res.reply.replace(/\n/g,'<br>')}</div>`;
+                } else {
+                    area.innerHTML += `<div class="ai-msg bot" style="color:var(--accent)">❌ ${escHtml(res?.message || 'Error')}</div>`;
+                }
+            } catch (err) {
+                document.getElementById('ai-loading')?.remove();
+                area.innerHTML += `<div class="ai-msg bot" style="color:var(--accent)">❌ Gagal membuat gambar.</div>`;
+            }
+            area.scrollTop = area.scrollHeight;
+        }
+
+        // Fungsi aman untuk render teks
+        function escHtml(s) { 
+            return String(s||'').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#x27;'}[c])); 
+        }
     </script>
 </body>
 </html>
