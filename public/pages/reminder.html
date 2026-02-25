@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AlgojoGacor — Reminder</title>
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/dashboard.css" />
+  <style>
+    .reminder-hero {
+      background: linear-gradient(135deg, #0d1b2a, #1a2a3a);
+      border: 1px solid rgba(76,201,240,0.3);
+      border-radius: 16px; padding: 28px; margin-bottom: 20px; text-align: center;
+    }
+    .reminder-item {
+      background: var(--bg-hover); border: 1px solid var(--border); border-radius: 12px;
+      padding: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+      transition: border-color 0.2s;
+    }
+    .reminder-item:hover { border-color: rgba(76,201,240,0.4); }
+    .reminder-icon { font-size: 28px; flex-shrink: 0; }
+    .reminder-info { flex: 1; min-width: 0; }
+    .reminder-text { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+    .reminder-time { font-size: 12px; color: var(--text-secondary); }
+    .reminder-eta {
+      font-size: 11px; background: rgba(76,201,240,0.15); color: var(--accent-blue);
+      padding: 3px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0;
+    }
+    .btn-del {
+      background: transparent; border: 1px solid rgba(231,76,60,0.4); color: #e74c3c;
+      padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .btn-del:hover { background: rgba(231,76,60,0.15); }
+    .time-chip {
+      padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600;
+      border: 1px solid var(--border); background: var(--bg-hover); color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+    .time-chip:hover, .time-chip.active { border-color: var(--accent-blue); color: var(--accent-blue); background: rgba(76,201,240,0.1); }
+    .empty-state { text-align: center; padding: 40px; color: var(--text-secondary); }
+    .empty-state .big { font-size: 48px; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <script src="/js/api.js"></script>
+  <script src="/js/reminderHandler.js"></script>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><span class="logo-icon">⚔️</span><div><div class="logo-text">AlgojoGacor</div><div class="logo-sub">Web Platform</div></div></div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" href="/dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a>
+      <div class="nav-section">AI & Tools</div>
+      <a class="nav-item" href="/pages/ai.html"><span class="nav-icon">🤖</span> AI Chat</a>
+      <a class="nav-item" href="/pages/tools.html"><span class="nav-icon">🛠️</span> Utilitas</a>
+      <a class="nav-item active" href="/pages/reminder.html"><span class="nav-icon">⏰</span> Reminder</a>
+      <a class="nav-item" href="/pages/zodiak.html"><span class="nav-icon">♈</span> Zodiak</a>
+      <a class="nav-item" href="/pages/shortlink.html"><span class="nav-icon">🔗</span> Shortlink</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="sidebar-avatar">?</div>
+        <div><div class="user-name" id="sidebar-username">Loading...</div></div>
+      </div>
+      <button class="btn btn-secondary btn-block btn-sm" onclick="logout()">🚪 Logout</button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+        <span class="topbar-title">⏰ Reminder</span>
+      </div>
+    </header>
+    <main class="content-area">
+
+      <div class="reminder-hero">
+        <div style="font-size:52px;margin-bottom:8px">⏰</div>
+        <h2 style="margin-bottom:6px">Pengingat Pintar</h2>
+        <p style="color:var(--text-secondary);font-size:14px">Set reminder sekali, bot ingatkan tepat waktu via browser</p>
+      </div>
+
+      <!-- Form -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><span class="icon">➕</span><h3>Buat Reminder Baru</h3></div>
+        <label class="form-label">Pesan Pengingat</label>
+        <input type="text" id="remind-text" class="form-control" placeholder="Minum obat, Meeting, Bayar tagihan..." style="margin-bottom:14px" maxlength="200" />
+
+        <label class="form-label">Waktu Cepat</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          <span class="time-chip" onclick="setTime('5m')">5 menit</span>
+          <span class="time-chip" onclick="setTime('15m')">15 menit</span>
+          <span class="time-chip" onclick="setTime('30m')">30 menit</span>
+          <span class="time-chip" onclick="setTime('1h')">1 jam</span>
+          <span class="time-chip" onclick="setTime('2h')">2 jam</span>
+          <span class="time-chip" onclick="setTime('6h')">6 jam</span>
+          <span class="time-chip" onclick="setTime('1d')">1 hari</span>
+        </div>
+
+        <label class="form-label">Atau Ketik Waktu / Pilih Tanggal</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+          <input type="text" id="remind-time" class="form-control" placeholder="5m / 2h / 1d / 08:30 / 25/12" />
+          <input type="datetime-local" id="remind-time-abs" class="form-control" style="max-width:220px" title="Pilih tanggal & jam spesifik" />
+        </div>
+
+        <button class="btn btn-primary btn-block" onclick="createReminder()" id="btn-create">➕ Buat Reminder</button>
+      </div>
+
+      <!-- List -->
+      <div class="card">
+        <div class="card-header">
+          <span class="icon">📋</span>
+          <h3>Reminder Aktif (<span id="remind-count">0</span>)</h3>
+          <button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="clearAll()">🗑️ Hapus Semua</button>
+        </div>
+        <div id="remind-list">
+          <div class="empty-state"><div class="big">📭</div><p>Belum ada reminder aktif.</p></div>
+        </div>
+      </div>
+
+      <div id="toast-container"></div>
+    </main>
+  </div>
+</div>
+<script>initReminder();</script>
+</body>
+</html>
