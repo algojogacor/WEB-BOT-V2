@@ -1,88 +1,356 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlgojoGacor — Login</title>
-    <link rel="stylesheet" href="/css/main.css">
-    <style>
-        body { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;
-               background: radial-gradient(ellipse at center, #1a1a2e 0%, #0f0f1a 100%); }
-        .auth-wrapper { width: 100%; max-width: 420px; }
-        .auth-logo { text-align: center; margin-bottom: 32px; }
-        .auth-logo .logo-main { font-size: 42px; }
-        .auth-logo h1 { font-size: 24px; color: var(--accent); margin: 8px 0 4px; }
-        .auth-logo p  { color: var(--text-muted); font-size: 14px; }
-        .auth-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; }
-        .auth-tabs { display: flex; margin-bottom: 24px; background: var(--bg-secondary); border-radius: var(--radius-sm); padding: 4px; }
-        .auth-tab { flex: 1; padding: 8px; text-align: center; cursor: pointer; border-radius: 6px; font-size: 14px; font-weight: 600; color: var(--text-muted); transition: all 0.2s; }
-        .auth-tab.active { background: var(--accent); color: #fff; }
-        .auth-form { display: none; }
-        .auth-form.active { display: block; }
-        .auth-footer { text-align: center; margin-top: 16px; font-size: 13px; color: var(--text-muted); }
-        .link-wa-note { background: rgba(76,201,240,0.1); border: 1px solid var(--accent-blue); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 13px; color: var(--accent-blue); margin-bottom: 16px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AlgojoGacor — Login</title>
+  <link rel="stylesheet" href="/css/main.css" />
+  <style>
+    /* ── Auth page layout ── */
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+      background: #0B0F19;
+    }
+
+    /* ── Ambient orbs ── */
+    .auth-orb-1 { width: 500px; height: 500px; top: -10%; left: -10%; animation-delay: 0s; }
+    .auth-orb-2 { width: 400px; height: 400px; bottom: -10%; right: -8%; animation-delay: 2.5s; }
+    .auth-orb-3 { width: 320px; height: 320px; top: 40%; left: 55%; animation-delay: 1.2s; }
+
+    /* ── Wrapper ── */
+    .auth-wrapper {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 440px;
+    }
+
+    /* ── Logo section ── */
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .auth-logo-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 76px; height: 76px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #00F5FF, #8B5CF6);
+      font-size: 36px;
+      margin-bottom: 16px;
+      box-shadow: 0 0 40px rgba(0,245,255,0.4), 0 0 80px rgba(139,92,246,0.2);
+      animation: float 3s ease-in-out infinite;
+      position: relative;
+    }
+    .auth-logo-icon::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #00F5FF, #8B5CF6, #FF00FF);
+      z-index: -1;
+      opacity: 0.5;
+      filter: blur(10px);
+      animation: pulse-orb 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-8px); }
+    }
+
+    .auth-logo h1 {
+      font-size: 32px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      background: linear-gradient(135deg, #00F5FF 0%, #A78BFA 50%, #FF00FF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+      letter-spacing: 0.04em;
+    }
+    .auth-logo p {
+      color: var(--text-muted);
+      font-size: 13px;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── Auth card ── */
+    .auth-card {
+      background: rgba(15,23,42,0.7);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07);
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,245,255,0.5), rgba(139,92,246,0.5), transparent);
+    }
+
+    /* ── Tabs ── */
+    .auth-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 28px;
+      background: rgba(0,0,0,0.35);
+      border-radius: 12px;
+      padding: 5px;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      transition: all 0.3s;
+      border: 1px solid transparent;
+    }
+    .auth-tab.active[data-tab="login"] {
+      background: linear-gradient(135deg, rgba(0,245,255,0.2), rgba(0,200,255,0.1));
+      color: #00F5FF;
+      border-color: rgba(0,245,255,0.3);
+      box-shadow: 0 0 20px rgba(0,245,255,0.15);
+    }
+    .auth-tab.active[data-tab="register"] {
+      background: linear-gradient(135deg, rgba(255,0,255,0.2), rgba(139,92,246,0.1));
+      color: #FF00FF;
+      border-color: rgba(255,0,255,0.3);
+      box-shadow: 0 0 20px rgba(255,0,255,0.15);
+    }
+
+    /* ── Forms ── */
+    .auth-form { display: none; }
+    .auth-form.active { display: block; }
+
+    /* Input with icon */
+    .input-wrap {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .input-wrap label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 7px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .input-wrap .icon {
+      position: absolute;
+      left: 14px;
+      bottom: 13px;
+      font-size: 16px;
+      color: var(--text-muted);
+      transition: color 0.3s;
+    }
+    .input-wrap input {
+      width: 100%;
+      padding: 13px 16px 13px 44px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: all 0.3s;
+    }
+    .input-wrap input::placeholder { color: var(--text-muted); }
+    .input-wrap input:focus {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 0 3px rgba(0,245,255,0.1), 0 0 20px rgba(0,245,255,0.1);
+      background: rgba(0,0,0,0.5);
+    }
+    .input-wrap input:focus + .icon,
+    .input-wrap input:focus ~ .icon { color: var(--neon-cyan); }
+
+    /* WA migrate note */
+    .wa-note {
+      background: rgba(0,245,255,0.07);
+      border: 1px solid rgba(0,245,255,0.2);
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 12px;
+      color: #67E8F9;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    .wa-note strong { color: var(--neon-cyan); }
+
+    /* Submit button */
+    .auth-submit {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 8px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-submit::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.6s;
+    }
+    .auth-submit:hover::after { transform: translateX(100%); }
+
+    .auth-submit.login-submit {
+      background: linear-gradient(135deg, #00F5FF, #00C8FF);
+      color: #0B0F19;
+      box-shadow: 0 0 25px rgba(0,245,255,0.4);
+    }
+    .auth-submit.login-submit:hover {
+      box-shadow: 0 0 40px rgba(0,245,255,0.6);
+      transform: translateY(-2px);
+    }
+    .auth-submit.register-submit {
+      background: linear-gradient(135deg, #FF00FF, #8B5CF6);
+      color: #fff;
+      box-shadow: 0 0 25px rgba(255,0,255,0.35);
+    }
+    .auth-submit.register-submit:hover {
+      box-shadow: 0 0 40px rgba(255,0,255,0.55);
+      transform: translateY(-2px);
+    }
+    .auth-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* Alert box */
+    #login-alert, #register-alert { margin-bottom: 14px; }
+
+    /* ── Footer ── */
+    .auth-footer {
+      text-align: center;
+      margin-top: 22px;
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+    .auth-footer span { color: var(--text-secondary); }
+
+    /* ── Decorative grid ── */
+    .auth-grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 1;
+    }
+  </style>
 </head>
 <body>
-    <div class="auth-wrapper">
-        <div class="auth-logo">
-            <div class="logo-main">⚔️</div>
-            <h1>AlgojoGacor</h1>
-            <p>Platform Web — Migrasi dari WA Bot</p>
-        </div>
 
-        <div class="auth-card">
-            <div class="auth-tabs">
-                <div class="auth-tab active" data-tab="login">Login</div>
-                <div class="auth-tab" data-tab="register">Daftar</div>
-            </div>
+  <!-- Ambient background -->
+  <div class="ambient-bg">
+    <div class="orb orb-cyan auth-orb-1"></div>
+    <div class="orb orb-pink auth-orb-2"></div>
+    <div class="orb orb-purple auth-orb-3"></div>
+  </div>
 
-            <!-- Login Form -->
-            <form class="auth-form active" id="login-form">
-                <div id="login-alert"></div>
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" class="form-input" id="login-username" placeholder="Masukkan username" autocomplete="username" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" class="form-input" id="login-password" placeholder="Masukkan password" autocomplete="current-password" required>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block btn-lg" id="login-btn">
-                    🚀 Login
-                </button>
-            </form>
+  <!-- Subtle grid overlay -->
+  <div class="auth-grid-bg"></div>
 
-            <!-- Register Form -->
-            <form class="auth-form" id="register-form">
-                <div class="link-wa-note">
-                    💡 Punya data WA Bot lama? Masukkan ID WA-mu agar aset terbawa otomatis!
-                </div>
-                <div id="register-alert"></div>
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" class="form-input" id="reg-username" placeholder="Pilih username (3-20 karakter)" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" class="form-input" id="reg-password" placeholder="Min. 6 karakter, 1 kapital, 1 angka" required>
-                </div>
-                <div class="form-group">
-                    <label>ID WA Lama <span style="color:var(--text-muted)">(Opsional — untuk migrasi data)</span></label>
-                    <input type="text" class="form-input" id="reg-waid" placeholder="628xxxxxxxx@s.whatsapp.net">
-                </div>
-                <button type="submit" class="btn btn-primary btn-block btn-lg" id="register-btn">
-                    ✅ Buat Akun
-                </button>
-            </form>
-        </div>
+  <!-- Auth wrapper -->
+  <div class="auth-wrapper">
 
-        <div class="auth-footer">
-            AlgojoGacor Web v1.0 &bull; Powered by Node.js + MongoDB
-        </div>
+    <!-- Logo -->
+    <div class="auth-logo">
+      <div class="auth-logo-icon">⚔️</div>
+      <h1>AlgojoGacor</h1>
+      <p>RPG & Economy Gaming Platform</p>
     </div>
 
-    <div id="toast-container"></div>
-    <script src="/js/auth.js"></script>
+    <!-- Auth card -->
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <div class="auth-tab active" data-tab="login">Login</div>
+        <div class="auth-tab" data-tab="register">Daftar</div>
+      </div>
+
+      <!-- LOGIN -->
+      <form class="auth-form active" id="login-form">
+        <div id="login-alert"></div>
+        <div class="input-wrap">
+          <label>Username</label>
+          <input type="text" id="login-username" placeholder="Masukkan username" autocomplete="username" required />
+          <span class="icon">👤</span>
+        </div>
+        <div class="input-wrap">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="Masukkan password" autocomplete="current-password" required />
+          <span class="icon">🔒</span>
+        </div>
+        <button type="submit" class="auth-submit login-submit" id="login-btn">
+          ⚡ Masuk Sekarang
+        </button>
+      </form>
+
+      <!-- REGISTER -->
+      <form class="auth-form" id="register-form">
+        <div class="wa-note">
+          💡 <strong>Punya akun WA Bot lama?</strong><br>
+          Isi ID WA-mu agar saldo & aset terbawa otomatis!
+        </div>
+        <div id="register-alert"></div>
+        <div class="input-wrap">
+          <label>Username</label>
+          <input type="text" id="reg-username" placeholder="Pilih username (3–20 karakter)" required />
+          <span class="icon">👤</span>
+        </div>
+        <div class="input-wrap">
+          <label>Password</label>
+          <input type="password" id="reg-password" placeholder="Min. 6 karakter, 1 kapital, 1 angka" required />
+          <span class="icon">🔒</span>
+        </div>
+        <div class="input-wrap">
+          <label>ID WA Lama <span style="color:var(--text-muted);text-transform:none;font-weight:400">(Opsional)</span></label>
+          <input type="text" id="reg-waid" placeholder="628xxxxxxxx@s.whatsapp.net" />
+          <span class="icon">📱</span>
+        </div>
+        <button type="submit" class="auth-submit register-submit" id="register-btn">
+          🚀 Buat Akun
+        </button>
+      </form>
+    </div>
+
+    <div class="auth-footer">
+      AlgojoGacor Web v2.0 &bull; <span>Powered by Node.js + MongoDB</span>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
 </body>
 </html>
