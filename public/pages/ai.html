@@ -93,21 +93,24 @@
 
             const area = document.getElementById('ai-chat-area');
             area.innerHTML += `<div class="ai-msg user">${escHtml(msg)}</div>`;
-            area.innerHTML += `<div class="ai-msg loading" id="ai-loading">🤔 Memproses chat...</div>`;
+            area.innerHTML += `<div class="ai-msg loading" id="ai-loading-chat">🤔 Memproses chat...</div>`;
             area.scrollTop = area.scrollHeight;
 
             try {
                 const res = await api.post('/features/ai/chat', { message: msg, model });
-                document.getElementById('ai-loading')?.remove();
+                document.getElementById('ai-loading-chat')?.remove();
                 
                 if (res?.success) {
                     area.innerHTML += `<div class="ai-msg bot">${escHtml(res.reply).replace(/\n/g,'<br>')}</div>`;
                 } else {
-                    area.innerHTML += `<div class="ai-msg bot" style="color:var(--accent)">❌ ${escHtml(res?.message || 'Error')}</div>`;
+                    area.innerHTML += `<div class="ai-msg bot" style="color:var(--accent)">❌ ${escHtml(res?.message || 'Error dari server')}</div>`;
                 }
             } catch (err) {
-                document.getElementById('ai-loading')?.remove();
-                area.innerHTML += `<div class="ai-msg bot" style="color:var(--accent)">❌ Gagal terhubung ke server.</div>`;
+                document.getElementById('ai-loading-chat')?.remove();
+                console.error("Chat error:", err);
+                let errMsg = err?.response?.data?.message || err?.message || 'Gagal terhubung ke server.';
+                if (typeof err === 'string') errMsg = err;
+                area.innerHTML += `<div class="ai-msg bot" style="color:var(--accent)">❌ ${escHtml(errMsg)}</div>`;
             }
             area.scrollTop = area.scrollHeight;
         }
@@ -121,23 +124,41 @@
 
             const area = document.getElementById('ai-chat-area');
             area.innerHTML += `<div class="ai-msg user">🎨 Gambarkan: ${escHtml(msg)}</div>`;
-            area.innerHTML += `<div class="ai-msg loading" id="ai-loading">🖌️ Sedang melukis gambar...</div>`;
+            area.innerHTML += `<div class="ai-msg loading" id="ai-loading-img">🖌️ Sedang melukis gambar...</div>`;
             area.scrollTop = area.scrollHeight;
 
             try {
                 const res = await api.post('/features/ai/imagine', { prompt: msg });
-                document.getElementById('ai-loading')?.remove();
+                document.getElementById('ai-loading-img')?.remove();
                 
                 if (res?.success) {
-                    // JANGAN gunakan escHtml di sini karena backend mengirimkan tag <img src="...">
-                    // Kita hanya me-replace enter menjadi <br>
-                    area.innerHTML += `<div class="ai-msg bot">${res.reply.replace(/\n/g,'<br>')}</div>`;
+                    area.innerHTML += `
+                    <div class="ai-msg bot">
+                        Berikut adalah gambar dari: <b>${escHtml(res.prompt)}</b><br><br>
+                        <img src="${res.imageUrl}" alt="AI Generated Image" 
+                             style="max-width: 100%; border-radius: 10px; margin-top: 10px; background: #2a2d36; min-height: 200px;" 
+                             onload="this.style.minHeight='auto'"
+                             onerror="this.onerror=null; this.src=''; this.alt='❌ Gagal memuat gambar dari server. Coba prompt lain atau ulangi nanti.';" />
+                    </div>
+                    `;
                 } else {
                     area.innerHTML += `<div class="ai-msg bot" style="color:var(--accent)">❌ ${escHtml(res?.message || 'Error')}</div>`;
                 }
             } catch (err) {
-                document.getElementById('ai-loading')?.remove();
-                area.innerHTML += `<div class="ai-msg bot" style="color:var(--accent)">❌ Gagal membuat gambar.</div>`;
+                document.getElementById('ai-loading-img')?.remove();
+                console.error("Imagine error:", err);
+                
+                // Menangkap pesan error asli dari backend (contoh: Saldo tidak cukup)
+                let errorMsg = 'Gagal membuat gambar.';
+                if (err?.response?.data?.message) {
+                    errorMsg = err.response.data.message;
+                } else if (err?.message) {
+                    errorMsg = err.message;
+                } else if (typeof err === 'string') {
+                    errorMsg = err;
+                }
+
+                area.innerHTML += `<div class="ai-msg bot" style="color:var(--accent)">❌ ${escHtml(errorMsg)}</div>`;
             }
             area.scrollTop = area.scrollHeight;
         }

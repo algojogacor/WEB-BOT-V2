@@ -75,23 +75,37 @@ async function imagine(req, res) {
     }
 
     try {
-        // Menggunakan Pollinations.ai (Gratis, cepat, dan mengembalikan format gambar langsung)
-        // Kita encode prompt agar aman dikirim ke URL
         const encodedPrompt = encodeURIComponent(prompt);
-        const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&nologo=true`;
+        const randomSeed = Math.floor(Math.random() * 1000000);
         
-        // Cukup format balasannya ke frontend dengan tag HTML atau sekadar URL
-        const reply = `Berikut adalah gambar dari: *${prompt}* \n\n<img src="${imageUrl}" alt="AI Generated Image" style="max-width:100%; border-radius:10px; margin-top:10px;" />`;
+        // Taruh API Key Pollinations kamu di sini
+        const API_KEY = 'sk_uBR94lDs7KOUlMknbnvm7C3NCOSGUwLp'; 
+        
+        // URL tujuan (menggunakan model flux sesuai dokumentasi)
+        const pollinationsUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?model=flux&width=512&height=512&nologo=true&seed=${randomSeed}`;
+
+        // Mendownload gambar menggunakan Axios dan API Key
+        const response = await axios.get(pollinationsUrl, {
+            headers: {
+                'Authorization': `Bearer ${API_KEY}`
+            },
+            responseType: 'arraybuffer', // WAJIB ADA: Agar file gambar tidak rusak
+            timeout: 45000 // Timeout 45 detik karena generate gambar butuh waktu
+        });
+
+        // Ubah data gambar menjadi format Base64 (teks) agar bisa dibaca oleh tag <img> di HTML
+        const base64Image = Buffer.from(response.data, 'binary').toString('base64');
+        const imageUrl = `data:image/jpeg;base64,${base64Image}`;
 
         // Potong saldo setelah berhasil
         u.balance -= TARIF_IMAGINE;
         await saveU(username, u, source);
 
-        res.json({ success: true, reply, sisaSaldo: u.balance });
+        // Kirim gambar Base64 ke frontend
+        res.json({ success: true, prompt: prompt, imageUrl: imageUrl, sisaSaldo: u.balance });
     } catch (err) {
-        console.error('Imagine error:', err);
-        res.status(500).json({ success: false, message: 'Gagal merender gambar.' });
+        console.error('Imagine error:', err.response?.data ? err.response.data.toString() : err.message);
+        res.status(500).json({ success: false, message: 'Gagal merender gambar dari server Pollinations.' });
     }
 }
-
 module.exports = { chat, imagine };
