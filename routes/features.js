@@ -160,4 +160,41 @@ const shortlink = require('../controllers/features/shortlinkController');
 router.post('/tools/shorten', shortlink.shorten);
 router.post('/tools/unshorten', shortlink.unshorten);
 
+// ── Nation (Sistem Negara) ────────────────────────────────
+const nation = require('../controllers/features/nationController');
+router.get('/nation', nation.getDashboard);
+router.get('/nation/top', nation.topNegara);
+router.get('/nation/stats/:targetUsername', nation.statsNegara);
+router.get('/nation/notifications', nation.getNotifikasi);
+router.delete('/nation/notifications', nation.clearNotifikasi);
+router.get('/nation/spy/log', nation.laporanMata);
+
+router.post('/nation/create',           gameLimiter, nation.buatNegara);
+router.post('/nation/build',            gameLimiter, nation.bangun);
+router.post('/nation/demolish',         gameLimiter, nation.demolish);
+router.post('/nation/research',         gameLimiter, nation.riset);
+router.post('/nation/tax',              gameLimiter, nation.pungutPajak);
+router.post('/nation/recruit',          gameLimiter, nation.rekrut);
+router.post('/nation/demobilize',       gameLimiter, nation.demobilisasi);
+router.post('/nation/subsidy',          gameLimiter, nation.subsidi);
+router.post('/nation/withdraw',         gameLimiter, nation.tarikKas);
+router.post('/nation/corrupt',          gameLimiter, nation.korupsi);
+router.post('/nation/propaganda',       gameLimiter, nation.propaganda);
+router.post('/nation/missile/build',    gameLimiter, nation.bangunRudal);
+router.post('/nation/nuke/build',       gameLimiter, nation.bangunBom);
+router.post('/nation/shield',           gameLimiter, nation.perisai);
+router.post('/nation/attack',           gameLimiter, nation.serang);
+router.post('/nation/airstrike',        gameLimiter, nation.serangUdara);
+router.post('/nation/blockade',         gameLimiter, nation.blokade);
+router.post('/nation/ceasefire',        gameLimiter, nation.gencatan);
+router.post('/nation/ceasefire/accept', gameLimiter, nation.terimaGencatan);
+router.post('/nation/alliance',         gameLimiter, nation.ajukanAliansi);
+router.post('/nation/alliance/accept',  gameLimiter, nation.terimaAliansi);
+router.post('/nation/alliance/reject',  gameLimiter, nation.tolakAliansi);
+router.post('/nation/alliance/break',   gameLimiter, nation.bubarAliansi);
+router.post('/nation/census',           gameLimiter, nation.sensus);
+router.post('/nation/rename',           gameLimiter, nation.rename);
+router.post('/nation/reset',            nation.resetNation);
+router.post('/nation/spy',              gameLimiter, nation.misiSpy);
+
 module.exports = router;

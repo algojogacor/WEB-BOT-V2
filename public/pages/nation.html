@@ -1,0 +1,1261 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>AlgojoGacor — Nation v3.0</title>
+  <link rel="stylesheet" href="/css/main.css"/>
+  <link rel="stylesheet" href="/css/dashboard.css"/>
+  <style>
+    /* ── NATION CUSTOM STYLES ── */
+    .nation-tabs { display:flex; gap:4px; flex-wrap:wrap; margin-bottom:20px; border-bottom:2px solid var(--border); padding-bottom:0; }
+    .ntab { padding:9px 16px; cursor:pointer; border-radius:8px 8px 0 0; font-weight:600; font-size:12px; color:var(--text-secondary); border-bottom:2px solid transparent; margin-bottom:-2px; transition:all .2s; white-space:nowrap; }
+    .ntab.active { color:var(--accent-gold,#f39c12); border-bottom-color:var(--accent-gold,#f39c12); background:rgba(243,156,18,.08); }
+    .ntab-pane { display:none; } .ntab-pane.active { display:block; }
+
+    .nation-header { background:linear-gradient(135deg,rgba(39,174,96,.12),rgba(41,128,185,.12)); border:1px solid rgba(39,174,96,.25); border-radius:16px; padding:24px; margin-bottom:20px; }
+    .nation-title { font-size:22px; font-weight:800; margin-bottom:4px; }
+    .nation-subtitle { color:var(--text-secondary); font-size:13px; }
+    .stat-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; margin-top:16px; }
+    .stat-box { background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:12px; text-align:center; }
+    .stat-val { font-size:18px; font-weight:800; color:var(--accent-green); }
+    .stat-val.danger { color:#e74c3c; }
+    .stat-val.warn { color:#f39c12; }
+    .stat-lbl { font-size:11px; color:var(--text-secondary); margin-top:3px; }
+
+    .progress-bar { height:8px; background:var(--border); border-radius:4px; overflow:hidden; margin:6px 0 2px; }
+    .progress-fill { height:100%; border-radius:4px; transition:width .3s; background:var(--accent-green); }
+    .progress-fill.warn { background:#f39c12; }
+    .progress-fill.danger { background:#e74c3c; }
+
+    .infra-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:14px; }
+    .infra-card { background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:16px; }
+    .infra-card.maxed { border-color:var(--accent-green); background:rgba(57,197,87,.04); }
+    .infra-name { font-weight:700; font-size:14px; margin-bottom:4px; }
+    .infra-efek { font-size:11px; color:var(--text-secondary); margin-bottom:10px; line-height:1.5; }
+    .infra-lv { font-size:12px; margin-bottom:8px; }
+    .lv-bar { display:flex; gap:3px; margin-bottom:8px; }
+    .lv-dot { width:14px; height:14px; border-radius:3px; background:var(--border); }
+    .lv-dot.filled { background:var(--accent-green); }
+    .lv-dot.current { background:#f39c12; }
+
+    .riset-card { background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:14px; }
+    .riset-card.done { border-color:var(--accent-green); background:rgba(57,197,87,.04); }
+    .riset-card.locked { opacity:.6; }
+
+    .nation-card { background:var(--card-bg); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:16px; }
+    .nation-card h3 { font-size:14px; font-weight:700; margin-bottom:14px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.5px; }
+
+    .war-item { display:flex; align-items:center; gap:10px; padding:10px; background:var(--bg-secondary); border-radius:8px; margin-bottom:8px; }
+    .war-result { font-size:11px; font-weight:700; padding:3px 8px; border-radius:10px; }
+    .war-result.MENANG { background:rgba(39,174,96,.2); color:#27ae60; }
+    .war-result.KALAH  { background:rgba(231,76,60,.2); color:#e74c3c; }
+
+    .top-row { display:grid; grid-template-columns:40px 1fr auto; gap:10px; align-items:center; padding:10px; background:var(--bg-secondary); border-radius:8px; margin-bottom:8px; }
+    .top-rank { font-size:18px; text-align:center; }
+    .top-name { font-weight:700; font-size:14px; }
+    .top-meta { font-size:11px; color:var(--text-secondary); }
+    .top-power { font-size:13px; font-weight:700; color:var(--accent-green); text-align:right; white-space:nowrap; }
+
+    .spy-card { background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:14px; }
+    .spy-card.locked { opacity:.55; }
+    .spy-result-box { background:rgba(155,89,182,.08); border:1px solid rgba(155,89,182,.3); border-radius:10px; padding:14px; margin-top:12px; }
+    .spy-log-item { display:flex; gap:10px; padding:8px; border-bottom:1px solid var(--border); font-size:12px; }
+    .spy-log-item:last-child { border-bottom:none; }
+
+    .notif-item { display:flex; gap:10px; padding:10px; border-bottom:1px solid var(--border); font-size:12px; align-items:flex-start; }
+    .notif-item:last-child { border-bottom:none; }
+    .notif-dot { width:8px; height:8px; border-radius:50%; background:#e74c3c; flex-shrink:0; margin-top:4px; }
+    .notif-time { color:var(--text-secondary); font-size:11px; }
+
+    .shield-active { background:rgba(39,174,96,.1); border:1px solid rgba(39,174,96,.3); border-radius:8px; padding:8px 12px; font-size:12px; color:#27ae60; display:inline-flex; align-items:center; gap:6px; }
+    .blockade-active { background:rgba(231,76,60,.1); border:1px solid rgba(231,76,60,.3); border-radius:8px; padding:8px 12px; font-size:12px; color:#e74c3c; display:inline-flex; align-items:center; gap:6px; }
+
+    .btn-sm2 { padding:6px 12px; font-size:12px; border-radius:6px; }
+    .btn-red { background:#e74c3c; color:#fff; border:none; cursor:pointer; }
+    .btn-red:hover { background:#c0392b; }
+    .btn-orange { background:#e67e22; color:#fff; border:none; cursor:pointer; }
+    .btn-orange:hover { background:#d35400; }
+    .btn-purple { background:#9b59b6; color:#fff; border:none; cursor:pointer; }
+    .btn-purple:hover { background:#8e44ad; }
+    .btn-nuke { background:linear-gradient(135deg,#e74c3c,#c0392b); color:#fff; border:none; cursor:pointer; animation:pulse-nuke 2s infinite; }
+    @keyframes pulse-nuke { 0%,100%{box-shadow:0 0 0 0 rgba(231,76,60,.4)} 50%{box-shadow:0 0 0 6px rgba(231,76,60,0)} }
+
+    .form-row { display:flex; gap:8px; margin-bottom:10px; align-items:flex-end; flex-wrap:wrap; }
+    .form-col { display:flex; flex-direction:column; gap:4px; }
+    .form-col label { font-size:11px; color:var(--text-secondary); }
+    .form-col input, .form-col select { padding:8px 10px; background:var(--input-bg); border:1px solid var(--border); border-radius:8px; color:var(--text-primary); font-size:13px; min-width:160px; }
+
+    .cd-badge { font-size:11px; color:var(--text-secondary); background:var(--bg-secondary); padding:2px 7px; border-radius:10px; }
+    .cd-badge.ready { color:#27ae60; background:rgba(39,174,96,.1); }
+
+    .no-nation-screen { text-align:center; padding:60px 20px; }
+    .no-nation-screen .big-icon { font-size:72px; margin-bottom:16px; }
+    .no-nation-screen h2 { font-size:20px; font-weight:800; margin-bottom:8px; }
+    .ally-item { display:flex; justify-content:space-between; align-items:center; padding:10px; background:var(--bg-secondary); border-radius:8px; margin-bottom:8px; }
+    .pending-item { display:flex; justify-content:space-between; align-items:center; padding:10px; border:1px solid var(--accent-gold,#f39c12); border-radius:8px; margin-bottom:8px; background:rgba(243,156,18,.05); }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+   <div id="sidebar-container"></div>
+  </aside>
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+        <span class="topbar-title">🌍 Nation v3.0</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span id="notif-badge" class="cd-badge" style="cursor:pointer" onclick="switchTab('notif')">🔔 0</span>
+        <button class="btn btn-secondary btn-sm" onclick="load()">↻ Refresh</button>
+      </div>
+    </header>
+    <main class="content-area">
+      <div id="main-content"></div>
+    </main>
+  </div>
+</div>
+<div id="toast-container"></div>
+<script src="/js/api.js"></script>
+<script src="/component/sidebarFetch.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let nation = null;
+let config = null;
+let topList = [];
+let notifList = [];
+let currentTab = 'dashboard';
+
+// const fmt = (n) => Math.floor(Number(n)||0).toLocaleString('id-ID');
+// const fmtPct = (n) => `${Math.min(100,Math.max(0,Math.round(n||0)))}%`;
+// const bar = (v,max=100,len=10) => { const f=Math.round((Math.min(v,max)/max)*len); return '█'.repeat(Math.max(0,f))+'░'.repeat(Math.max(0,len-f)); };
+
+// ═══════════════════════════════════════════════════════════════
+// LOAD DATA
+// ═══════════════════════════════════════════════════════════════
+async function load() {
+  try {
+    const r = await api.get('/features/nation');
+    nation = r.nation;
+    config = r.config;
+  } catch(e) { showToast('error', e.message); }
+
+  try {
+    const r2 = await api.get('/features/nation/top');
+    topList = r2.list || [];
+  } catch(e) {}
+
+  try {
+    const r3 = await api.get('/features/nation/notifications');
+    notifList = r3.notifikasi || [];
+  } catch(e) {}
+
+  const unread = notifList.length;
+  const badge = document.getElementById('notif-badge');
+  if (badge) badge.textContent = `🔔 ${unread}`;
+  if (badge) badge.className = 'cd-badge' + (unread > 0 ? '' : ' ready');
+
+  render();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER UTAMA
+// ═══════════════════════════════════════════════════════════════
+function render() {
+  const container = document.getElementById('main-content');
+
+  if (!nation) {
+    container.innerHTML = renderNoNation();
+    return;
+  }
+
+  container.innerHTML = `
+    ${renderHeader()}
+    <div class="nation-tabs">
+      ${['dashboard','infrastruktur','militer','ekonomi','diplomasi','intelijen','peta-dunia','notif'].map(t => `
+        <div class="ntab ${currentTab===t?'active':''}" onclick="switchTab('${t}')">
+          ${tabIcon(t)} ${tabLabel(t)}
+        </div>`).join('')}
+    </div>
+    <div id="tab-content">
+      ${renderTabContent()}
+    </div>
+  `;
+}
+
+function switchTab(t) {
+  currentTab = t;
+  render();
+  window.scrollTo(0,0);
+}
+
+function tabIcon(t) {
+  return { dashboard:'📊', infrastruktur:'🏗️', militer:'⚔️', ekonomi:'💰', diplomasi:'🤝', intelijen:'🕵️', 'peta-dunia':'🌍', notif:'🔔' }[t] || '';
+}
+
+function tabLabel(t) {
+  return { dashboard:'Dashboard', infrastruktur:'Infrastruktur', militer:'Militer', ekonomi:'Ekonomi', diplomasi:'Diplomasi', intelijen:'Intelijen', 'peta-dunia':'Peta Dunia', notif:'Notifikasi' }[t] || t;
+}
+
+function renderTabContent() {
+  switch(currentTab) {
+    case 'dashboard': return renderDashboard();
+    case 'infrastruktur': return renderInfrastruktur();
+    case 'militer': return renderMiliter();
+    case 'ekonomi': return renderEkonomi();
+    case 'diplomasi': return renderDiplomasi();
+    case 'intelijen': return renderIntelijen();
+    case 'peta-dunia': return renderPetaDunia();
+    case 'notif': return renderNotif();
+    default: return '';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER: NO NATION
+// ═══════════════════════════════════════════════════════════════
+function renderNoNation() {
+  const biaya = config?.biayaBerdiri || 5_000_000_000;
+  return `
+    <div class="no-nation-screen">
+      <div class="big-icon">🌍</div>
+      <h2>Sistem Nation v3.0</h2>
+      <p style="color:var(--text-secondary);margin:8px 0 20px">Bangun negara, perkuat militer, serang musuh, jalin aliansi!</p>
+      <div class="nation-card" style="max-width:480px;margin:0 auto;text-align:left">
+        <h3>💸 BIAYA MENDIRIKAN NEGARA</h3>
+        <p style="color:var(--accent-green);font-size:20px;font-weight:800">Rp ${fmt(biaya)}</p>
+        <p style="font-size:12px;color:var(--text-secondary);margin:8px 0 16px">Termasuk kas awal Rp 2.000.000.000 untuk modal pertama</p>
+        <div class="form-row">
+          <div class="form-col" style="flex:1">
+            <label>Nama Negara (maks 25 karakter)</label>
+            <input id="inp-nama" placeholder="contoh: Nusantara Jaya" maxlength="25"/>
+          </div>
+          <button class="btn btn-primary" onclick="doCreate()">🚀 Dirikan!</button>
+        </div>
+      </div>
+      <div style="margin-top:24px">
+        <h3 style="margin-bottom:12px">🌍 Peta Kekuatan Dunia (${topList.length} Negara)</h3>
+        ${renderPetaDunia()}
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER: HEADER
+// ═══════════════════════════════════════════════════════════════
+function renderHeader() {
+  if (!nation) return '';
+  const stabColor = nation.stability >= 70 ? 'var(--accent-green)' : nation.stability >= 40 ? '#f39c12' : '#e74c3c';
+  const stabClass = nation.stability >= 70 ? '' : nation.stability >= 40 ? 'warn' : 'danger';
+
+  let badges = '';
+  if (nation.perisaiOn) badges += `<span class="shield-active">🛡️ Perisai Aktif</span>`;
+  if (nation.diblokOn)  badges += `<span class="blockade-active" style="margin-left:8px">⛔ Diblokade</span>`;
+
+  return `
+    <div class="nation-header">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+        <div>
+          <div class="nation-title">🏛️ Republik ${nation.name.toUpperCase()}</div>
+          <div class="nation-subtitle">Ranking #${nation.rank} dari ${nation.total} negara · Power: ${fmt(nation.power)}</div>
+          <div style="margin-top:8px">${badges}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:24px;font-weight:800;color:var(--accent-green)">Rp ${fmt(nation.treasury)}</div>
+          <div style="font-size:11px;color:var(--text-secondary)">Kas Negara</div>
+        </div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-box">
+          <div class="stat-val">${fmt(nation.population)}</div>
+          <div class="stat-lbl">👥 Penduduk</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">${fmt(nation.defense)}</div>
+          <div class="stat-lbl">⚔️ Tentara</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val ${stabClass}">${nation.stability}%</div>
+          <div class="stat-lbl">📊 Stabilitas</div>
+          <div class="progress-bar"><div class="progress-fill ${stabClass}" style="width:${nation.stability}%"></div></div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">${nation.rudal}</div>
+          <div class="stat-lbl">🚀 Rudal</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">${nation.bomNuklir}</div>
+          <div class="stat-lbl">☢️ Bom Nuklir</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">${nation.winRate}%</div>
+          <div class="stat-lbl">🏆 Win Rate (${nation.totalMenang}M/${nation.totalKalah}K)</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER: DASHBOARD TAB
+// ═══════════════════════════════════════════════════════════════
+function renderDashboard() {
+  const pajak = fmt(nation.pajak);
+  const bangunanAktif = config.bangunan.filter(b => b.curLv > 0);
+  const risetAktif = config.riset.filter(r => r.sudah);
+
+  // War log
+  const warLog = (nation.warLog || []).slice().reverse().slice(0,5);
+
+  // Sekutu
+  const sekutu = nation.sekutu || [];
+
+  return `
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+      <!-- Keuangan -->
+      <div class="nation-card">
+        <h3>💰 Keuangan</h3>
+        <div style="font-size:13px;line-height:1.8">
+          <div>Kas: <b>Rp ${fmt(nation.treasury)}</b></div>
+          <div>Est. Pajak/sesi: <b>Rp ${pajak}</b></div>
+          <div>Total Pajak: <b>Rp ${fmt(nation.totalPajak)}</b></div>
+          ${nation.diblokOn ? `<div style="color:#e74c3c">⛔ Diblokade: Pajak -50%</div>` : ''}
+        </div>
+        <div style="margin-top:12px">
+          <span class="cd-badge ${!nation.cdPajak?'ready':''}">
+            ${!nation.cdPajak ? '✅ Siap Pungut Pajak' : `⏳ Pajak: ${nation.cdPajakStr}`}
+          </span>
+        </div>
+      </div>
+
+      <!-- Militer -->
+      <div class="nation-card">
+        <h3>⚔️ Kekuatan Militer</h3>
+        <div style="font-size:13px;line-height:1.8">
+          <div>Tentara: <b>${fmt(nation.defense)}</b></div>
+          <div>Power Rating: <b>${fmt(nation.power)}</b></div>
+          <div>Rudal: <b>${nation.rudal}</b> | Bom Nuklir: <b>${nation.bomNuklir}</b></div>
+          <div>Rekam Perang: <b>${nation.totalMenang}M / ${nation.totalKalah}K</b></div>
+        </div>
+        <div style="margin-top:8px">
+          <span class="cd-badge ${!nation.cdSerang?'ready':''}">
+            ${!nation.cdSerang ? '✅ Siap Menyerang' : `⏳ Serang: ${nation.cdSerangStr}`}
+          </span>
+        </div>
+      </div>
+
+      <!-- Bangunan Aktif -->
+      <div class="nation-card">
+        <h3>🏗️ Infrastruktur Aktif</h3>
+        ${bangunanAktif.length === 0 ? '<div style="color:var(--text-secondary);font-size:12px">Belum ada bangunan</div>' :
+          bangunanAktif.map(b => `<div style="font-size:12px;margin-bottom:4px">${b.nama} <b>Lv.${b.curLv}</b></div>`).join('')
+        }
+      </div>
+
+      <!-- Riset Aktif -->
+      <div class="nation-card">
+        <h3>🔬 Teknologi Aktif</h3>
+        ${risetAktif.length === 0 ? '<div style="color:var(--text-secondary);font-size:12px">Belum ada riset</div>' :
+          risetAktif.map(r => `<div style="font-size:12px;margin-bottom:4px">✅ ${r.nama}</div>`).join('')
+        }
+      </div>
+
+      <!-- Sekutu -->
+      <div class="nation-card">
+        <h3>🤝 Sekutu (${sekutu.length}/${nation.aliansi?.length||0})</h3>
+        ${sekutu.length === 0 ? '<div style="color:var(--text-secondary);font-size:12px">Tidak ada sekutu</div>' :
+          sekutu.map(s => `<div style="font-size:12px;margin-bottom:4px">${s.name} — Power: ${fmt(s.power)}</div>`).join('')
+        }
+      </div>
+
+      <!-- Riwayat Perang -->
+      <div class="nation-card">
+        <h3>📜 Riwayat Perang</h3>
+        ${warLog.length === 0 ? '<div style="color:var(--text-secondary);font-size:12px">Belum pernah berperang</div>' :
+          warLog.map(w => `
+            <div class="war-item">
+              <div style="flex:1">
+                <div style="font-size:12px;font-weight:600">vs ${w.vs}</div>
+                <div style="font-size:10px;color:var(--text-secondary)">${new Date(w.time).toLocaleString('id-ID')}</div>
+              </div>
+              <span class="war-result ${w.result}">${w.result}</span>
+            </div>`).join('')
+        }
+      </div>
+    </div>
+
+    <!-- AKSI CEPAT -->
+    <div class="nation-card" style="margin-top:16px">
+      <h3>⚡ Aksi Cepat</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <button class="btn btn-primary btn-sm" onclick="switchTab('ekonomi')">💰 Kelola Keuangan</button>
+        <button class="btn btn-secondary btn-sm" onclick="switchTab('infrastruktur')">🏗️ Bangun</button>
+        <button class="btn btn-secondary btn-sm" onclick="switchTab('militer')">⚔️ Rekrut Tentara</button>
+        <button class="btn btn-secondary btn-sm" onclick="switchTab('diplomasi')">🤝 Diplomasi</button>
+        <button class="btn btn-secondary btn-sm" onclick="switchTab('intelijen')">🕵️ Misi Rahasia</button>
+        <button class="btn btn-secondary btn-sm" onclick="doSensus()">📋 Sensus (Rp 100jt)</button>
+        <button class="btn btn-secondary btn-sm" onclick="doRename()">✏️ Rename Negara</button>
+        <button class="btn btn-secondary btn-sm" style="color:#e74c3c" onclick="doReset()">🗑️ Hapus Negara</button>
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER: INFRASTRUKTUR
+// ═══════════════════════════════════════════════════════════════
+function renderInfrastruktur() {
+  const bangunan = config.bangunan || [];
+  const riset = config.riset || [];
+
+  return `
+    <div class="nation-card">
+      <h3>💰 Kas Negara: Rp ${fmt(nation.treasury)}</h3>
+      <p style="font-size:12px;color:var(--text-secondary)">Harga naik setiap level. Demolish = refund 50% dari harga level saat ini.</p>
+    </div>
+
+    <h3 style="margin:16px 0 10px">🏗️ Bangunan</h3>
+    <div class="infra-grid">
+      ${bangunan.map(b => {
+        const maxed = b.curLv >= b.maxLv;
+        const dots = Array.from({length: b.maxLv}, (_, i) => `<div class="lv-dot ${i < b.curLv ? 'filled' : ''}"></div>`).join('');
+        return `
+          <div class="infra-card ${maxed?'maxed':''}">
+            <div class="infra-name">${b.nama}</div>
+            <div class="infra-efek">${b.efek}</div>
+            <div class="lv-bar">${dots}</div>
+            <div class="infra-lv">Level: <b>${b.curLv}</b>/${b.maxLv}${maxed?' 🏆 MAX':''}</div>
+            <div style="display:flex;gap:6px">
+              ${!maxed ? `<button class="btn btn-primary btn-sm" onclick="doBangun('${b.kode}','${b.nama}',${b.hargaNext})">
+                🏗️ Bangun — Rp ${fmt(b.hargaNext)}
+              </button>` : ''}
+              ${b.curLv > 0 ? `<button class="btn btn-secondary btn-sm" onclick="doDemolish('${b.kode}','${b.nama}')">
+                🔨 Bongkar
+              </button>` : ''}
+            </div>
+          </div>`;
+      }).join('')}
+    </div>
+
+    <h3 style="margin:24px 0 10px">🔬 Riset Teknologi</h3>
+    <div class="infra-grid">
+      ${riset.map(r => `
+        <div class="riset-card ${r.sudah?'done':r.locked?'locked':''}">
+          <div style="font-weight:700;font-size:13px;margin-bottom:4px">${r.nama}</div>
+          <div style="font-size:11px;color:var(--text-secondary);margin-bottom:10px">${r.efek}</div>
+          ${r.sudah ? '<div style="color:var(--accent-green);font-size:12px">✅ Sudah diriset</div>' :
+            r.locked ? `<div style="font-size:11px;color:#e74c3c">🔒 Butuh Universitas Lv.${r.univ_min}</div>` :
+            `<button class="btn btn-primary btn-sm" onclick="doRiset('${r.kode}','${r.nama}',${r.biaya})">
+              🔬 Riset — Rp ${fmt(r.biaya)}
+            </button>`
+          }
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER: MILITER
+// ═══════════════════════════════════════════════════════════════
+function renderMiliter() {
+  return `
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+
+      <!-- Rekrut / Demobilisasi -->
+      <div class="nation-card">
+        <h3>🪖 Rekrut & Demobilisasi</h3>
+        <div style="font-size:13px;margin-bottom:12px">
+          Tentara saat ini: <b>${fmt(nation.defense)}</b><br>
+          Biaya rekrut: <b>Rp ${fmt(50_000_000)}/personil</b><br>
+          Refund demobilisasi: <b>40%</b>
+        </div>
+        <div class="form-row">
+          <div class="form-col">
+            <label>Jumlah</label>
+            <input id="inp-rekrut" type="number" placeholder="100" min="1"/>
+          </div>
+          <button class="btn btn-primary btn-sm2" onclick="doRekrut()">🪖 Rekrut</button>
+          <button class="btn btn-secondary btn-sm2" onclick="doDemobilisasi()">↩️ Demob</button>
+        </div>
+      </div>
+
+      <!-- Rudal -->
+      <div class="nation-card">
+        <h3>🚀 Arsenal Rudal (${nation.rudal}/${20})</h3>
+        <div style="font-size:12px;margin-bottom:12px;color:var(--text-secondary)">
+          Butuh: Silo Rudal<br>
+          Biaya per rudal: <b>Rp ${fmt(20_000_000_000)}</b><br>
+          Efek: Bonus serangan +20% (atau +50% jika ada Lab Nuklir)
+        </div>
+        ${nation.buildings?.silo > 0
+          ? `<button class="btn btn-primary btn-sm" onclick="doBangunRudal()">🚀 Produksi Rudal</button>`
+          : `<div style="font-size:12px;color:#e74c3c">🔒 Bangun Silo Rudal dulu!</div>`
+        }
+      </div>
+
+      <!-- Bom Nuklir -->
+      <div class="nation-card">
+        <h3>☢️ Bom Nuklir (${nation.bomNuklir}/${3})</h3>
+        <div style="font-size:12px;margin-bottom:12px;color:var(--text-secondary)">
+          Butuh: Silo + Lab Nuklir<br>
+          Biaya: <b>Rp ${fmt(100_000_000_000)}</b><br>
+          Efek: 3x damage, 80% hancurkan bangunan musuh
+        </div>
+        ${(nation.buildings?.nuklir > 0 && nation.buildings?.silo > 0)
+          ? `<button class="btn btn-nuke btn-sm" onclick="doBangunBom()">☢️ Produksi Bom Nuklir</button>`
+          : `<div style="font-size:12px;color:#e74c3c">🔒 Butuh Silo Rudal + Lab Nuklir!</div>`
+        }
+      </div>
+
+      <!-- Perisai -->
+      <div class="nation-card">
+        <h3>🛡️ Perisai Pelindung</h3>
+        <div style="font-size:12px;margin-bottom:12px;color:var(--text-secondary)">
+          Durasi: <b>2 jam</b><br>
+          Biaya: <b>Rp ${fmt(5_000_000_000)}</b><br>
+          Kebal dari: serangan, sabotase, teror, blokade
+        </div>
+        ${nation.perisaiOn
+          ? `<span class="shield-active">🛡️ Aktif!</span>`
+          : `<button class="btn btn-primary btn-sm" onclick="doPerisai()">🛡️ Aktifkan Perisai</button>`
+        }
+      </div>
+
+      <!-- Serang Darat -->
+      <div class="nation-card">
+        <h3>⚔️ Serangan Darat</h3>
+        <div class="cd-badge ${!nation.cdSerang?'ready':''}" style="display:inline-block;margin-bottom:10px">
+          ${!nation.cdSerang ? '✅ Siap menyerang' : `⏳ Cooldown: ${nation.cdSerangStr}`}
+        </div>
+        <div class="form-row">
+          <div class="form-col">
+            <label>Username Target</label>
+            <input id="inp-serang" placeholder="username_target"/>
+          </div>
+          <button class="btn btn-red btn-sm2" onclick="doSerang()">⚔️ Serang!</button>
+        </div>
+        <div style="font-size:11px;color:var(--text-secondary)">Target akan dinotifikasi</div>
+      </div>
+
+      <!-- Serangan Udara -->
+      <div class="nation-card">
+        <h3>✈️ Serangan Udara</h3>
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">
+          Rudal: ${nation.rudal} unit | Bom Nuklir: ${nation.bomNuklir} unit
+        </div>
+        <div class="form-row">
+          <div class="form-col">
+            <label>Username Target</label>
+            <input id="inp-udara" placeholder="username_target"/>
+          </div>
+          <div class="form-col">
+            <label>Senjata</label>
+            <select id="sel-senjata">
+              <option value="rudal">🚀 Rudal (${nation.rudal} unit)</option>
+              <option value="nuklir">☢️ Bom Nuklir (${nation.bomNuklir} unit)</option>
+            </select>
+          </div>
+          <button class="btn btn-orange btn-sm2" onclick="doUdara()">✈️ Tembak!</button>
+        </div>
+      </div>
+
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER: EKONOMI
+// ═══════════════════════════════════════════════════════════════
+function renderEkonomi() {
+  return `
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+
+      <!-- Pajak -->
+      <div class="nation-card">
+        <h3>💰 Pungut Pajak</h3>
+        <div style="font-size:13px;margin-bottom:10px">
+          Estimasi: <b style="color:var(--accent-green)">Rp ${fmt(nation.pajak)}</b>/sesi<br>
+          Populasi: <b>${fmt(nation.population)}</b> jiwa
+        </div>
+        <div class="cd-badge ${!nation.cdPajak?'ready':''}" style="display:inline-block;margin-bottom:10px">
+          ${!nation.cdPajak ? '✅ Siap dipungut!' : `⏳ ${nation.cdPajakStr}`}
+        </div><br>
+        <button class="btn btn-primary btn-sm" onclick="doPajak()" ${nation.cdPajak||nation.stability<20?'disabled':''}>
+          💰 Pungut Pajak
+        </button>
+        ${nation.stability < 20 ? '<div style="font-size:11px;color:#e74c3c;margin-top:6px">Stabilitas terlalu rendah!</div>' : ''}
+      </div>
+
+      <!-- Propaganda -->
+      <div class="nation-card">
+        <h3>📣 Propaganda</h3>
+        <div style="font-size:13px;margin-bottom:10px">
+          Stabilitas: <b>${nation.stability}%</b><br>
+          Biaya: <b>Rp ${fmt(500_000_000)}</b> | Efek: +10-25% stabilitas
+        </div>
+        <div class="cd-badge ${!nation.cdProp?'ready':''}" style="display:inline-block;margin-bottom:10px">
+          ${!nation.cdProp ? '✅ Siap!' : `⏳ ${nation.cdPropStr}`}
+        </div><br>
+        <button class="btn btn-secondary btn-sm" onclick="doPropaganda()" ${nation.cdProp?'disabled':''}>📣 Sebar Propaganda</button>
+      </div>
+
+      <!-- Subsidi -->
+      <div class="nation-card">
+        <h3>💸 Subsidi dari Kantong Pribadi</h3>
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">Transfer saldo pribadimu ke kas negara. Stabilitas +3%.</div>
+        <div class="form-row">
+          <div class="form-col">
+            <label>Nominal (atau "all")</label>
+            <input id="inp-subsidi" placeholder="1000000000 atau all"/>
+          </div>
+          <button class="btn btn-primary btn-sm2" onclick="doSubsidi()">💸 Subsidi</button>
+        </div>
+      </div>
+
+      <!-- Tarik Kas -->
+      <div class="nation-card">
+        <h3>🏦 Tarik Kas ke Pribadi</h3>
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">Pajak penarikan 10%. Kas: Rp ${fmt(nation.treasury)}</div>
+        <div class="form-row">
+          <div class="form-col">
+            <label>Nominal (atau "all")</label>
+            <input id="inp-tarik" placeholder="1000000000 atau all"/>
+          </div>
+          <button class="btn btn-secondary btn-sm2" onclick="doTarikKas()">💰 Tarik</button>
+        </div>
+      </div>
+
+      <!-- Korupsi -->
+      <div class="nation-card" style="border-color:#e74c3c30">
+        <h3>😈 Korupsi ⚠️</h3>
+        <div style="font-size:12px;color:#e74c3c;margin-bottom:10px">RISIKO TINGGI: Stabilitas turun 5-25%. Jika stabilitas = 0, negara HANCUR!</div>
+        <div class="form-row">
+          <div class="form-col">
+            <label>Nominal dari kas negara</label>
+            <input id="inp-korupsi" placeholder="nominal atau all"/>
+          </div>
+          <button class="btn btn-red btn-sm2" onclick="doKorupsi()">😈 Korupsi!</button>
+        </div>
+      </div>
+
+      <!-- Blokade -->
+      <div class="nation-card">
+        <h3>⛔ Blokade Ekonomi Musuh</h3>
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">
+          Butuh: Dermaga Militer<br>
+          Biaya: Rp ${fmt(2_000_000_000)} | Durasi: 4 jam | Efek: Pajak musuh -50%
+        </div>
+        <div class="cd-badge ${!nation.cdBlokade?'ready':''}" style="display:inline-block;margin-bottom:10px">
+          ${!nation.cdBlokade ? '✅ Siap' : `⏳ ${nation.cdBlokadeStr}`}
+        </div>
+        <div class="form-row">
+          <div class="form-col">
+            <label>Username Target</label>
+            <input id="inp-blokade" placeholder="username_target"/>
+          </div>
+          <button class="btn btn-orange btn-sm2" onclick="doBlokade()" ${!nation.buildings?.dermaga||nation.cdBlokade?'disabled':''}>
+            ⛔ Blokade
+          </button>
+        </div>
+        ${!nation.buildings?.dermaga ? '<div style="font-size:11px;color:#e74c3c">Butuh Dermaga Militer!</div>' : ''}
+      </div>
+
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER: DIPLOMASI
+// ═══════════════════════════════════════════════════════════════
+function renderDiplomasi() {
+  const pendingAliansi  = nation.pendingAliansiMasuk  || [];
+  const pendingGencatan = nation.pendingGencatanMasuk || [];
+  const sekutu = nation.sekutu || [];
+
+  return `
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+
+      <!-- Sekutu Aktif -->
+      <div class="nation-card">
+        <h3>🤝 Sekutu Aktif (${sekutu.length}/3)</h3>
+        ${sekutu.length === 0 ? '<div style="color:var(--text-secondary);font-size:12px">Tidak ada sekutu</div>' :
+          sekutu.map(s => `
+            <div class="ally-item">
+              <div>
+                <div style="font-weight:700;font-size:13px">${s.name}</div>
+                <div style="font-size:11px;color:var(--text-secondary)">Power: ${fmt(s.power)} · @${s.username}</div>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="doButusAliansi('${s.username}','${s.name}')">Putuskan</button>
+            </div>`).join('')
+        }
+        <div style="margin-top:12px">
+          <div class="form-row">
+            <div class="form-col">
+              <label>Ajukan ke Username</label>
+              <input id="inp-aliansi" placeholder="username_target"/>
+            </div>
+            <button class="btn btn-primary btn-sm2" onclick="doAjukanAliansi()">🤝 Ajukan</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending Aliansi Masuk -->
+      <div class="nation-card">
+        <h3>📬 Permintaan Aliansi Masuk (${pendingAliansi.length})</h3>
+        ${pendingAliansi.length === 0 ? '<div style="color:var(--text-secondary);font-size:12px">Tidak ada permintaan</div>' :
+          pendingAliansi.map(p => `
+            <div class="pending-item">
+              <div>
+                <div style="font-weight:700">${p.fromNation}</div>
+                <div style="font-size:11px;color:var(--text-secondary)">@${p.fromUsername}</div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-primary btn-sm" onclick="doTerimaAliansi('${p.fromUsername}')">✅ Terima</button>
+                <button class="btn btn-secondary btn-sm" onclick="doTolakAliansi('${p.fromUsername}')">❌ Tolak</button>
+              </div>
+            </div>`).join('')
+        }
+      </div>
+
+      <!-- Gencatan Senjata -->
+      <div class="nation-card">
+        <h3>🕊️ Gencatan Senjata</h3>
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">
+          Biaya: Rp ${fmt(1_000_000_000)} | Efek: Tidak bisa saling serang 24 jam
+        </div>
+        <div class="form-row">
+          <div class="form-col">
+            <label>Username Target</label>
+            <input id="inp-gencatan" placeholder="username_target"/>
+          </div>
+          <button class="btn btn-secondary btn-sm2" onclick="doGencatan()">🕊️ Tawarkan</button>
+        </div>
+      </div>
+
+      <!-- Pending Gencatan Masuk -->
+      <div class="nation-card">
+        <h3>🕊️ Tawaran Gencatan Masuk (${pendingGencatan.length})</h3>
+        ${pendingGencatan.length === 0 ? '<div style="color:var(--text-secondary);font-size:12px">Tidak ada tawaran</div>' :
+          pendingGencatan.map(p => `
+            <div class="pending-item">
+              <div>
+                <div style="font-weight:700">${p.fromNation}</div>
+                <div style="font-size:11px;color:var(--text-secondary)">@${p.fromUsername}</div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="doTerimaGencatan('${p.fromUsername}')">✅ Terima</button>
+            </div>`).join('')
+        }
+      </div>
+
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER: INTELIJEN
+// ═══════════════════════════════════════════════════════════════
+function renderIntelijen() {
+  const misiList = config.misiSpy || [];
+  const hasIntel = (nation.buildings?.intel || 0) > 0;
+
+  return `
+    ${!hasIntel ? `
+      <div class="nation-card" style="border-color:#e74c3c30;text-align:center">
+        <div style="font-size:40px;margin-bottom:10px">🔒</div>
+        <h3>Markas Intelijen Dibutuhkan</h3>
+        <p style="color:var(--text-secondary);font-size:13px">Bangun Markas Intelijen (Rp 15 Miliar) untuk membuka operasi rahasia.</p>
+        <button class="btn btn-primary" onclick="switchTab('infrastruktur')">🏗️ Ke Infrastruktur</button>
+      </div>` : ''}
+
+    <div class="cd-badge ${!nation.cdSpy?'ready':''}" style="display:inline-block;margin-bottom:16px">
+      ${!nation.cdSpy ? '✅ Agen siap beroperasi' : `⏳ Agen dalam operasi: ${nation.cdSpyStr}`}
+    </div>
+
+    <div style="margin-bottom:16px">
+      <div class="form-row">
+        <div class="form-col">
+          <label>Username Target Operasi</label>
+          <input id="inp-spy-target" placeholder="username_target" style="min-width:220px"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="infra-grid">
+      ${misiList.map(m => `
+        <div class="spy-card ${m.locked||!hasIntel?'locked':''}">
+          <div style="font-weight:700;font-size:14px;margin-bottom:4px">${m.nama}</div>
+          <div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px">
+            Biaya: Rp ${fmt(m.biaya)}<br>
+            Peluang sukses: ~${m.sukses}%<br>
+            ${m.locked ? `🔒 Butuh Intel Lv.${m.intel_min}` : `Intel Lv.${m.intel_min}+ ✅`}
+          </div>
+          <button class="btn btn-purple btn-sm" onclick="doSpy('${m.kode}','${m.nama}')"
+            ${m.locked||!hasIntel||nation.cdSpy?'disabled':''}>
+            🕵️ Jalankan
+          </button>
+        </div>`).join('')}
+    </div>
+
+    <!-- Laporan Mata -->
+    <div class="nation-card" style="margin-top:20px">
+      <h3 style="display:flex;justify-content:space-between">
+        📋 Laporan Intelijen
+        <button class="btn btn-secondary btn-sm" onclick="loadSpyLog()">🔄 Muat Log</button>
+      </h3>
+      <div id="spy-log-container"><div style="color:var(--text-secondary);font-size:12px">Klik "Muat Log" untuk melihat riwayat misi.</div></div>
+    </div>
+
+    <!-- Hasil Operasi -->
+    <div id="spy-result" style="display:none" class="spy-result-box"></div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER: PETA DUNIA
+// ═══════════════════════════════════════════════════════════════
+function renderPetaDunia() {
+  if (!topList || topList.length === 0) {
+    return '<div style="color:var(--text-secondary);text-align:center;padding:20px">Belum ada negara yang berdiri.</div>';
+  }
+
+  const medals = ['🥇','🥈','🥉'];
+
+  return `
+    <div class="nation-card">
+      <h3>🌍 Peta Kekuatan Dunia — ${topList.length} Negara</h3>
+      ${topList.slice(0,15).map((n,i) => `
+        <div class="top-row ${n.isMe?'border-glow':''}">
+          <div class="top-rank">${medals[i] || (i+1)}</div>
+          <div>
+            <div class="top-name">${n.name} ${n.isMe?'👈':''} ${n.perisaiOn?'🛡️':''}</div>
+            <div class="top-meta">
+              @${n.username} · 👥${fmt(n.population)} · 🏰Lv.${n.bentengLv} · 🚀${n.rudal} · WR ${n.winRate}% · ${n.aliansiCount} sekutu
+            </div>
+          </div>
+          <div class="top-power">
+            ${fmt(n.power)} ⭐
+            ${!n.isMe && nation ? `<br><button class="btn btn-secondary btn-sm" onclick="doLihatStats('${n.username}','${n.name}')">🔭 Intel</button>` : ''}
+          </div>
+        </div>`).join('')}
+    </div>
+    <div id="stats-detail" style="margin-top:12px"></div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER: NOTIFIKASI
+// ═══════════════════════════════════════════════════════════════
+function renderNotif() {
+  return `
+    <div class="nation-card">
+      <h3 style="display:flex;justify-content:space-between">
+        🔔 Notifikasi (${notifList.length})
+        <button class="btn btn-secondary btn-sm" onclick="doClearNotif()">🗑️ Hapus Semua</button>
+      </h3>
+      ${notifList.length === 0 ? '<div style="color:var(--text-secondary);font-size:12px">Tidak ada notifikasi</div>' :
+        notifList.slice(0,20).map(n => `
+          <div class="notif-item">
+            <div class="notif-dot"></div>
+            <div style="flex:1">
+              <div>${n.msg}</div>
+              <div class="notif-time">${new Date(n.time).toLocaleString('id-ID')}</div>
+            </div>
+          </div>`).join('')
+      }
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTION FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+async function doCreate() {
+  const nama = document.getElementById('inp-nama')?.value?.trim();
+  if (!nama) return showToast('error','Masukkan nama negara!');
+  try {
+    const r = await api.post('/features/nation/create', { nama });
+    showToast('success', r.message);
+    await load();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doBangun(kode, nama, harga) {
+  if (!confirm(`Bangun ${nama}?\nBiaya: Rp ${fmt(harga)}\nDari kas negara`)) return;
+  try {
+    const r = await api.post('/features/nation/build', { kode });
+    showToast('success', r.message);
+    nation = r.nation; config.bangunan.find(b=>b.kode===kode).curLv++;
+    render();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doDemolish(kode, nama) {
+  if (!confirm(`Bongkar ${nama}? Refund 50%?`)) return;
+  try {
+    const r = await api.post('/features/nation/demolish', { kode });
+    showToast('success', r.message);
+    await load();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doRiset(kode, nama, biaya) {
+  if (!confirm(`Riset ${nama}?\nBiaya: Rp ${fmt(biaya)} dari kas negara`)) return;
+  try {
+    const r = await api.post('/features/nation/research', { kode });
+    showToast('success', r.message);
+    await load();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doPajak() {
+  try {
+    const r = await api.post('/features/nation/tax', {});
+    showToast('success', r.message.replace(/\n/g,' | '));
+    nation = r.nation; render();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doRekrut() {
+  const qty = document.getElementById('inp-rekrut')?.value;
+  if (!qty) return showToast('error','Masukkan jumlah!');
+  try {
+    const r = await api.post('/features/nation/recruit', { qty });
+    showToast('success', r.message);
+    nation = r.nation; render();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doDemobilisasi() {
+  const qty = document.getElementById('inp-rekrut')?.value;
+  if (!qty) return showToast('error','Masukkan jumlah!');
+  if (!confirm(`Demobilisasi ${fmt(qty)} tentara? (refund 40%)`)) return;
+  try {
+    const r = await api.post('/features/nation/demobilize', { qty });
+    showToast('success', r.message);
+    nation = r.nation; render();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doSubsidi() {
+  const amount = document.getElementById('inp-subsidi')?.value?.trim();
+  if (!amount) return showToast('error','Masukkan nominal!');
+  try {
+    const r = await api.post('/features/nation/subsidy', { amount });
+    showToast('success', r.message);
+    nation = r.nation; render();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doTarikKas() {
+  const amount = document.getElementById('inp-tarik')?.value?.trim();
+  if (!amount) return showToast('error','Masukkan nominal!');
+  try {
+    const r = await api.post('/features/nation/withdraw', { amount });
+    showToast('success', r.message);
+    nation = r.nation; render();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doKorupsi() {
+  const amount = document.getElementById('inp-korupsi')?.value?.trim();
+  if (!amount) return showToast('error','Masukkan nominal!');
+  if (!confirm(`⚠️ Korupsi Rp ${amount}? Stabilitas akan turun! Risiko negara hancur!`)) return;
+  try {
+    const r = await api.post('/features/nation/corrupt', { amount });
+    showToast(r.negaraHancur ? 'error' : 'success', r.message.split('\n')[0]);
+    await load();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doPropaganda() {
+  try {
+    const r = await api.post('/features/nation/propaganda', {});
+    showToast('success', r.message);
+    nation = r.nation; render();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doBangunRudal() {
+  if (!confirm('Produksi 1 rudal? Biaya: Rp 20.000.000.000 dari kas negara')) return;
+  try {
+    const r = await api.post('/features/nation/missile/build', {});
+    showToast('success', r.message);
+    nation = r.nation; render();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doBangunBom() {
+  if (!confirm('⚠️ Produksi 1 BOM NUKLIR? Biaya: Rp 100.000.000.000 dari kas negara')) return;
+  try {
+    const r = await api.post('/features/nation/nuke/build', {});
+    showToast('success', r.message);
+    nation = r.nation; render();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doPerisai() {
+  if (!confirm('Aktifkan Perisai Pelindung 2 jam? Biaya: Rp 5.000.000.000')) return;
+  try {
+    const r = await api.post('/features/nation/shield', {});
+    showToast('success', r.message);
+    nation = r.nation; render();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doSerang() {
+  const targetUsername = document.getElementById('inp-serang')?.value?.trim();
+  if (!targetUsername) return showToast('error','Masukkan username target!');
+  if (!confirm(`⚔️ Serang ${targetUsername}? Target akan dinotifikasi.`)) return;
+  try {
+    const r = await api.post('/features/nation/attack', { targetUsername });
+    showToast(r.hasilPerang==='MENANG' ? 'success' : 'error', r.message.substring(0,120));
+    nation = r.nation; render();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doUdara() {
+  const targetUsername = document.getElementById('inp-udara')?.value?.trim();
+  const senjata = document.getElementById('sel-senjata')?.value;
+  if (!targetUsername) return showToast('error','Masukkan username target!');
+  const useNuklir = senjata === 'nuklir';
+  if (useNuklir && !confirm('☢️ GUNAKAN BOM NUKLIR?! Ini senjata pemusnah massal! Yakin?')) return;
+  else if (!useNuklir && !confirm(`✈️ Tembakkan rudal ke ${targetUsername}?`)) return;
+  try {
+    const r = await api.post('/features/nation/airstrike', { targetUsername, useNuklir });
+    showToast('success', r.message.substring(0,120));
+    nation = r.nation; render();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doBlokade() {
+  const targetUsername = document.getElementById('inp-blokade')?.value?.trim();
+  if (!targetUsername) return showToast('error','Masukkan username target!');
+  if (!confirm(`⛔ Blokade ekonomi ${targetUsername} selama 4 jam? Biaya: Rp 2.000.000.000`)) return;
+  try {
+    const r = await api.post('/features/nation/blockade', { targetUsername });
+    showToast('success', r.message);
+    nation = r.nation; render();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doGencatan() {
+  const targetUsername = document.getElementById('inp-gencatan')?.value?.trim();
+  if (!targetUsername) return showToast('error','Masukkan username target!');
+  try {
+    const r = await api.post('/features/nation/ceasefire', { targetUsername });
+    showToast('success', r.message);
+    nation = r.nation; render();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doTerimaGencatan(fromUsername) {
+  try {
+    const r = await api.post('/features/nation/ceasefire/accept', { fromUsername });
+    showToast('success', r.message);
+    await load();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doAjukanAliansi() {
+  const targetUsername = document.getElementById('inp-aliansi')?.value?.trim();
+  if (!targetUsername) return showToast('error','Masukkan username target!');
+  try {
+    const r = await api.post('/features/nation/alliance', { targetUsername });
+    showToast('success', r.message);
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doTerimaAliansi(fromUsername) {
+  try {
+    const r = await api.post('/features/nation/alliance/accept', { fromUsername });
+    showToast('success', r.message);
+    await load();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doTolakAliansi(fromUsername) {
+  try {
+    const r = await api.post('/features/nation/alliance/reject', { fromUsername });
+    showToast('success', r.message);
+    await load();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doButusAliansi(targetUsername, nama) {
+  if (!confirm(`Putuskan aliansi dengan ${nama}?`)) return;
+  try {
+    const r = await api.post('/features/nation/alliance/break', { targetUsername });
+    showToast('success', r.message);
+    await load();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doSpy(jenis, nama) {
+  const targetUsername = document.getElementById('inp-spy-target')?.value?.trim();
+  if (!targetUsername) return showToast('error','Masukkan username target di field atas!');
+  if (!confirm(`🕵️ Jalankan misi "${nama}" terhadap ${targetUsername}?`)) return;
+  try {
+    const r = await api.post('/features/nation/spy', { jenis, targetUsername });
+    const box = document.getElementById('spy-result');
+    if (box) {
+      box.style.display = 'block';
+      let html = `<b>${r.message}</b>`;
+      if (r.detail && r.sukses) {
+        html += '<hr style="border-color:rgba(255,255,255,.1);margin:8px 0"/>';
+        if (jenis === 'spionase') {
+          html += `<div style="font-size:12px;line-height:1.8">
+            💰 Kas: Rp ${fmt(r.detail.kas)}<br>
+            ⚔️ Tentara: ${fmt(r.detail.tentara)}<br>
+            🏰 Benteng: Lv.${r.detail.benteng} | 🏦 Bank: Lv.${r.detail.bank}<br>
+            🕵️ Intel: Lv.${r.detail.intel} | 📡 Radar: Lv.${r.detail.radar}<br>
+            🚀 Rudal: ${r.detail.rudal} | ☢️ Bom: ${r.detail.bomNuklir}<br>
+            📊 Stabilitas: ${r.detail.stabilitas}% | Perisai: ${r.detail.perisaiOn?'🔒 AKTIF':'🔓 OFF'}<br>
+            🔬 Riset: ${r.detail.riset}<br>
+            🤝 Aliansi: ${r.detail.aliansi}
+          </div>`;
+        } else if (jenis === 'sadap') {
+          html += `<div style="font-size:12px;line-height:1.8">
+            🤝 Sekutu: ${r.detail.sekutu?.join(', ')||'Tidak ada'}<br>
+            ⚔️ Serangan terakhir: ${r.detail.lastAttack}<br>
+            📊 Total perang: ${r.detail.totalPerang} | WR: ${r.detail.winRate}%<br>
+            🏗️ Bangunan: ${r.detail.bangunan?.join(', ')||'Tidak ada'}
+          </div>`;
+        }
+      }
+      box.innerHTML = html;
+      nation = r.nation;
+      render();
+    }
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function loadSpyLog() {
+  try {
+    const r = await api.get('/features/nation/spy/log');
+    const container = document.getElementById('spy-log-container');
+    if (!container) return;
+    if (!r.logs || r.logs.length === 0) {
+      container.innerHTML = '<div style="color:var(--text-secondary);font-size:12px">Belum ada riwayat misi.</div>';
+      return;
+    }
+    container.innerHTML = r.logs.slice(0,15).map(l => `
+      <div class="spy-log-item">
+        <div>${l.sukses ? '✅' : '❌'}</div>
+        <div style="flex:1">
+          <b>${l.misiNama}</b> → ${l.targetName}<br>
+          <span style="color:var(--text-secondary)">${l.timeStr}</span><br>
+          ${l.hasil}
+        </div>
+      </div>`).join('');
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doLihatStats(targetUsername, nama) {
+  try {
+    const r = await api.get(`/features/nation/stats/${targetUsername}`);
+    const s = r.stats;
+    const box = document.getElementById('stats-detail');
+    if (box) {
+      box.innerHTML = `
+        <div class="nation-card">
+          <h3>🔭 Intel Publik: ${s.name}</h3>
+          <div style="font-size:13px;line-height:1.9">
+            ⭐ Power: ${fmt(s.power)}<br>
+            📊 Stabilitas: ${s.stability}% (${s.statusStab})<br>
+            ⚔️ Kekuatan: ${s.statusMil}<br>
+            👥 Penduduk: ~${fmt(s.population)} jiwa<br>
+            🛡️ Perisai: ${s.perisaiOn ? '🔒 AKTIF' : '🔓 Tidak aktif'}<br>
+            🤝 Sekutu: ${s.aliansiCount}<br>
+            📈 Total Perang: ${s.totalPerang} | WR: ${s.winRate}%
+          </div>
+        </div>`;
+    }
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doSensus() {
+  if (!confirm('Sensus negara? Biaya: Rp 100.000.000 dari kas')) return;
+  try {
+    const r = await api.post('/features/nation/census', {});
+    const s = r;
+    alert(`📊 LAPORAN SENSUS\n\nRanking: #${s.rank} dari ${s.total}\nPower: ${fmt(s.power)}\nEst. Pajak: Rp ${fmt(s.pajak)}\nWin Rate: ${s.winRate}%`);
+    nation = r.nation;
+    render();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doRename() {
+  const nama = prompt('Nama baru negara (maks 25 karakter):\nBiaya: Rp 1.000.000.000 dari kas');
+  if (!nama) return;
+  try {
+    const r = await api.post('/features/nation/rename', { nama });
+    showToast('success', r.message);
+    await load();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doReset() {
+  const confirm1 = confirm('⚠️ HAPUS NEGARA? Semua data akan hilang permanen!');
+  if (!confirm1) return;
+  const confirm2 = confirm('⚠️ YAKIN BENAR-BENAR INGIN MENGHAPUS? Tidak bisa dibatalkan!');
+  if (!confirm2) return;
+  try {
+    const r = await api.post('/features/nation/reset', {});
+    showToast('success', r.message);
+    await load();
+  } catch(e) { showToast('error', e.message); }
+}
+
+async function doClearNotif() {
+  try {
+    await api.delete('/features/nation/notifications');
+    notifList = [];
+    const badge = document.getElementById('notif-badge');
+    if (badge) { badge.textContent = '🔔 0'; badge.className = 'cd-badge ready'; }
+    render();
+  } catch(e) { showToast('error', e.message); }
+}
+
+// Override api.delete helper if needed
+if (!api.delete) {
+  api.delete = async (url) => {
+    const token = getToken();
+    const res = await fetch(url, {
+      method:'DELETE',
+      headers:{ 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+    return data;
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+const ME = getUser();
+if (!ME) { window.location.href = '/'; }
+
+// Load sidebar
+fetch('/component/sidebar.html').then(r=>r.text()).then(html=>{
+ document.getElementById('sidebar-container').innerHTML = html;
+  if (document.getElementById('sidebar-username')) {
+    document.getElementById('sidebar-username').textContent = ME.username;
+    document.getElementById('sidebar-avatar').textContent = ME.username[0].toUpperCase();
+    document.getElementById('sidebar-role').textContent = ME.role || 'user';
+    if (['admin','developer'].includes(ME.role)) {
+      document.querySelectorAll('.admin-only').forEach(el=>el.classList.remove('hidden'));
+    }
+  }
+});
+
+load();
+// Auto refresh setiap 60 detik
+setInterval(load, 60000);
+</script>
+</body>
+</html>
